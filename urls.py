@@ -28,6 +28,8 @@ urlpatterns = patterns('charref.characters.views',
     (r'^morph/create/$', 'create_morph'),
     (r'^description/create/$', 'create_description'),
     (r'^location/create/$', 'create_location'),
+
+    (r'^_species/$', 'ajax_list_species')
 )
 
 urlpatterns += patterns('charref.gallery.views',

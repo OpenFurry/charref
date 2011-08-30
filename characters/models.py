@@ -8,7 +8,8 @@ class Character(models.Model):
 class Morph(models.Model):
     character = models.ForeignKey('Character')
     gender = models.CharField(max_length = 20)
-    species = models.CharField(max_length = 60)
+    species_text = models.CharField(max_length = 60)
+    species_category = models.ForeignKey('SpeciesCategory')
     
 class Description(models.Model):
     morph = models.ForeignKey('Morph')
@@ -19,3 +20,7 @@ class Location(models.Model):
     name = models.CharField(max_length = 120)
     description = models.TextField()
     owner = models.ForeignKey(User)
+
+class SpeciesCategory(models.Model):
+    name = models.CharField(max_length = 50)
+    parent = models.ForeignKey('SpeciesCategory')
