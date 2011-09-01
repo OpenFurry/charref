@@ -8,6 +8,10 @@ urlpatterns = patterns('charref.characters.views',
     (r'^~(?P<username>[a-zA-Z0-9\-_])/$', 'show_user'),
     (r'^profile/edit/$', 'edit_user'),
     (r'^register/$', 'register'),
+    (r'^users/$', 'list_users'),
+
+    (r'^characters/$', 'list_characters'),
+    (r'^locations/$', 'list_locations'),
 
     (r'^c(haracter)?/(?P<character_id>\d+)/$', 'show_character'),
     (r'^m(orph)?/(?P<morph_id>\d+)/$', 'show_morph'),

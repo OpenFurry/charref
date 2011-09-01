@@ -22,6 +22,22 @@ def register(request):
 
 ##
 
+def list_characters(request):
+    query = Character.objects.all()
+    paginator = Paginator(query, 10)
+
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        characters = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        logs = paginator.page(paginator.num_pages)
+
+    return render_to_response('characters/character/list.html', context_instance = RequestContext(request, {'characters': characters}))
+
 def show_character(request, character_id):
     character = get_object_or_404(Character, id = character_id)
     return render_to_response('characters/character/show.html', context_instance = RequestContext(request, {'character': character}))
@@ -75,6 +91,22 @@ def create_description(request, description_id):
     pass
 
 ##
+
+def list_locations(request):
+    query = Location.objects.all()
+    paginator = Paginator(query, 10)
+
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        locations = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        logs = paginator.page(paginator.num_pages)
+
+    return render_to_response('characters/location/list.html', context_instance = RequestContext(request, {'locations': locations}))
 
 def show_location(request, location_id):
     location = get_object_or_404(Location, id = location_id)
