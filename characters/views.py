@@ -44,15 +44,44 @@ def show_character(request, character_id):
 
 @login_required
 def edit_character(request, character_id):
-    pass
+    if (request.method == "GET"):
+        return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {}))
+    if (request.POST.get('name', None) is not None):
+        c = get_object_or_404(Character, id = character_id)
+        c.name = request.POST['name']
+        c.save()
+        return HttpResponseRedirect(c.get_aboslute_url())
+    else:
+        request.user.message_set.create(message = '<div class="error">You must enter a name!</div>')
+        return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {}))
 
 @login_required
 def delete_character(request, character_id):
-    pass
+    if (request.POST.get('confirm', None) == "yes"):
+        character = get_object_or_404(Character, id = character_id)
+        if (request.user != character.user):
+            request.user.message_set.create(message = '<div class="error">You may only delete your own characters!</div>')
+            return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
+        character.delete()
+        return HttpResponseRedirect('/~' + request.user.username)
+    else:
+        character = get_object_or_404(Character, id = character_id)
+        if (request.user != character.user):
+            request.user.message_set.create(message = '<div class="error">You may only delete your own characters!</div>')
+            return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
+        return render_to_response('characters/character/delete.html', context_instance = RequestContext(request, {'character': character}))
 
 @login_required
 def create_character(request, character_id):
-    pass
+    if (request.method == "GET"):
+        return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {}))
+    if (request.POST.get('name', None) is not None):
+        c = Character(name = request.POST['name'])
+        c.save()
+        return HttpResponseRedirect(c.get_aboslute_url())
+    else:
+        request.user.message_set.create(message = '<div class="error">You must enter a name!</div>')
+        return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {}))
 
 ##
 

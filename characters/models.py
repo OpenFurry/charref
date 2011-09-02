@@ -5,6 +5,9 @@ class Character(models.Model):
     name = models.CharField(max_length = 60)
     user = models.ForeignKey(User)
 
+    def get_absolute_url(self):
+        return '/c/%s' % self.id
+
 class Morph(models.Model):
     character = models.ForeignKey('Character')
     gender = models.CharField(max_length = 20)
