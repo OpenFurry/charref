@@ -9,12 +9,14 @@ class Character(models.Model):
         return '/c/%s' % self.id
 
 class Morph(models.Model):
+    user = models.ForeignKey(User)
     character = models.ForeignKey('Character')
     gender = models.CharField(max_length = 20)
     species_text = models.CharField(max_length = 60)
     species_category = models.ForeignKey('SpeciesCategory')
     
 class Description(models.Model):
+    user = models.ForeignKey(User) # Keeps us from having to say description.morph.character.user
     morph = models.ForeignKey('Morph')
     name = models.CharField(max_length = 30)
     description = models.TextField()

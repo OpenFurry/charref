@@ -1,17 +1,30 @@
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core import serializers
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.models import User
 from django.contrib.flatpages.models import FlatPage
+from django.contrib.contenttypes.models import ContentType
 from charref.characters.models import *
+from charref.activitystream.models import *
 
 def front(request):
-    pass
+pass
 
 def show_user(request, username):
-    user = get_object_or_404(User, username = username)
-    return render_to_response('characters/user/show.html', context_instance = RequestContext(request, {'user': user}))
+user = get_object_or_404(User, username = username)
+if (request.user != user):
+    si = StreamItem(
+            action_type = 'R',
+            user = request.user,
+            content_type = ContentType.objects.get_for_model(User)
+            object_id = user.id)
+    si.save()
+    if (request.is_ajax()):
+        return HttpResponse(serializers.serialize("json", user), mimetype = "application/json")
+    else:
+        return render_to_response('characters/user/show.html', context_instance = RequestContext(request, {'user': user}))
 
 @login_required
 def edit_user(request):
@@ -36,11 +49,24 @@ def list_characters(request):
     except (EmptyPage, InvalidPage):
         logs = paginator.page(paginator.num_pages)
 
-    return render_to_response('characters/character/list.html', context_instance = RequestContext(request, {'characters': characters}))
+    if (request.is_ajax()):
+        return HttpResponse(serializers.serialize("json", characters), mimetype = "application/json")
+    else:
+        return render_to_response('characters/character/list.html', context_instance = RequestContext(request, {'characters': characters}))
 
 def show_character(request, character_id):
     character = get_object_or_404(Character, id = character_id)
-    return render_to_response('characters/character/show.html', context_instance = RequestContext(request, {'character': character}))
+    if (request.user != character.user):
+        si = StreamItem(
+                action_type = 'R',
+                user = request.user
+                content_type = ContentType.get_for_model(Character)
+                object_id = character_id)
+        si.save()
+    if (request.is_ajax()):
+        return HttpResponse(serializers.serialize("json", character), mimetype = "application/json")
+    else:
+        return render_to_response('characters/character/show.html', context_instance = RequestContext(request, {'character': character}))
 
 @login_required
 def edit_character(request, character_id):
@@ -50,6 +76,12 @@ def edit_character(request, character_id):
         c = get_object_or_404(Character, id = character_id)
         c.name = request.POST['name']
         c.save()
+        si = StreamItem(
+                action_type = 'U',
+                user = request.user
+                content_type = ContentType.get_for_model(Character)
+                object_id = character_id)
+        si.save()
         return HttpResponseRedirect(c.get_aboslute_url())
     else:
         request.user.message_set.create(message = '<div class="error">You must enter a name!</div>')
@@ -63,6 +95,12 @@ def delete_character(request, character_id):
             request.user.message_set.create(message = '<div class="error">You may only delete your own characters!</div>')
             return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
         character.delete()
+        si = StreamItem(
+                action_type = 'D',
+                user = request.user
+                content_type = ContentType.get_for_model(Character)
+                object_id = character_id)
+        si.save()
         return HttpResponseRedirect('/~' + request.user.username)
     else:
         character = get_object_or_404(Character, id = character_id)
@@ -78,6 +116,12 @@ def create_character(request, character_id):
     if (request.POST.get('name', None) is not None):
         c = Character(name = request.POST['name'])
         c.save()
+        si = StreamItem(
+                action_type = 'C',
+                user = request.user
+                content_type = ContentType.get_for_model(Character)
+                object_id = character_id)
+        si.save()
         return HttpResponseRedirect(c.get_aboslute_url())
     else:
         request.user.message_set.create(message = '<div class="error">You must enter a name!</div>')
@@ -87,7 +131,17 @@ def create_character(request, character_id):
 
 def show_morph(request, morph_id):
     morph = get_object_or_404(Morph, id = morph_id)
-    return render_to_response('characters/morph/show.html', context_instance = RequestContext(request,  {'morph': morph}))
+    if (request.user != morph.user):
+        si = StreamItem(
+                action_type = 'R',
+                user = request.user
+                content_type = ContentType.get_for_model(Morph)
+                object_id = character_id)
+        si.save()
+    if (request.is_ajax()):
+        return HttpResponse(serializers.serialize("json", morph), mimetype = "application/json")
+    else:
+        return render_to_response('characters/morph/show.html', context_instance = RequestContext(request,  {'morph': morph}))
 
 @login_required
 def edit_morph(request, morph_id):
@@ -105,7 +159,17 @@ def create_morph(request, morph_id):
 
 def show_description(request, description_id):
     description = get_object_or_404(Description, id = description_id)
-    return render_to_response('characters/description/show.html', context_instance = RequestContext(request, {'description': description}))
+    if (request.user != description.user
+        si = StreamItem(
+                action_type = 'R',
+                user = request.user
+                content_type = ContentType.get_for_model(Description)
+                object_id = character_id)
+        si.save()
+    if (request.is_ajax()):
+        return HttpResponse(serializers.serialize("json", description), mimetype = "application/json")
+    else:
+        return render_to_response('characters/description/show.html', context_instance = RequestContext(request, {'description': description}))
 
 @login_required
 def edit_description(request, description_id):
@@ -135,11 +199,24 @@ def list_locations(request):
     except (EmptyPage, InvalidPage):
         logs = paginator.page(paginator.num_pages)
 
-    return render_to_response('characters/location/list.html', context_instance = RequestContext(request, {'locations': locations}))
+    if (request.is_ajax()):
+        return HttpResponse(serializers.serialize("json", locations), mimetype = "application/json")
+    else:
+        return render_to_response('characters/location/list.html', context_instance = RequestContext(request, {'locations': locations}))
 
 def show_location(request, location_id):
     location = get_object_or_404(Location, id = location_id)
-    return render_to_response('characters/location/show.html', context_instance = RequestContext(request, {'location': location}))
+    if (request.user != location.owner):
+        si = StreamItem(
+                action_type = 'R',
+                user = request.user
+                content_type = ContentType.get_for_model(Character)
+                object_id = character_id)
+        si.save()
+    if (request.is_ajax()):
+        return HttpResponse(serializers.serialize("json", location), mimetype = "application/json")
+    else:
+        return render_to_response('characters/location/show.html', context_instance = RequestContext(request, {'location': location}))
 
 @login_required
 def edit_location(request, location_id):
