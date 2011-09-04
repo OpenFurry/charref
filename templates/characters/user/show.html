@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user_object.username }} (user) - {% endblock %}
+
+{% block header %}User: {% if not user_object.is_active %}<s>{% endif %}{{ user_object.username }}{% if not user_object.is_active %}</s>{% endif %}{% endblock %}
+
+{% block content %}
+<article id="twoway">
+    <section class="wrapper">
+        <h3>Stats</h3>
+        <p><strong>Username:</strong> {% if not user_object.is_active %}<s>{% endif %}{{ user_object.username }}{% if not user_object.is_active %}</s>{% endif %}
+            {% if user_object.is_superuser %}<em>Superuser!</em>{% else %}{% if user_object.is_staff %}<em>Staff!</em>{% endif %}{% endif %}
+        </p>
+        <p><strong>Name:</strong> {{ user_object.get_full_name }}</p>
+        <p><strong>User since:</strong> {{ user_object.date_joined|date:"SHORT_DATE_FORMAT" }}
+        <p><strong>Characters:</strong> {{ user_object.character_set.count }}
+        <p><strong>Morphs:</strong> {{ user_object.morph_set.count }}
+        <p><strong>Descriptions:</strong> {{ user_object.description_set.count }}
+        <p><strong>Locations (as owner):</strong> {{ user_object.description_set.count }}
+        {% if user == user_object %}
+            <div class="hide" id="updateform">
+                <hr />
+                <form method="post" action="/~{{ user.username }}/edit">
+                    {% csrf_token %}
+                    <table>
+                        <tr>
+                            <th><label for="firstname">First name:</label></th>
+                            <td><input type="text" name="firstname" value="{{ user.first_name }}" /></td>
+                        </tr>
+                        <tr>
+                            <th><label for="firstname">Last name:</label></th>
+                            <td><input type="text" name="firstname" value="{{ user.last_name }}" /></td>
+                        </tr>
+                        <tr>
+                            <th><label for="firstname">E-mail:</label></th>
+                            <td><input type="text" name="firstname" value="{{ user.email }}" /></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="submit" value="Save" /></td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        {% endif %}
+    </section>
+    <section class="wrapper">
+        <h3>Characters</h3>
+        {% for character in user_object.character_set.all %}
+            <a href="{{ character.get_absolute_url }}">{{ character.name }}</a>
+        {% endfor %}
+    </section>
+    <section class="wrapper">
+        <h3>Images</h3>
+        {% for image in user_object.image_set.all %}
+            <img src="{{ image.thumb }}" />
+        {% endfor %}
+    </section>
+</article>
+{% endblock %}

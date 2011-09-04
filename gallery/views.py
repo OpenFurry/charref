@@ -11,14 +11,14 @@ from charref.activitystream.models import *
 
 def show_image(request, image_id):
     image = get_object_or_404(Image, image_id)
-    if (request.is_ajax()):
-        return HttpResponse(serializers.serialize("json", image), mimetype = "application/json")
+    if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
+        return HttpResponse(serializers.serialize("json", (image,)), mimetype = "application/json")
     else:
         return render_to_response('gallery/image/show.html', context_instance = RequestContext(request, {'image': image}))
 
 def list_images_for_user(request, username):
     images = Image.objects.filter(user__username__exact = username)
-    if (request.is_ajax()):
+    if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", images), mimetype = "application/json")
     else:
         return render_to_response('gallery/image/list.html', context_instance = RequestContext(Request, {'images': image}))
@@ -26,7 +26,7 @@ def list_images_for_user(request, username):
 def list_images_attached_to_object(request, app_name, model, object_id):
     ias = ContentType.objects.get_by_natural_key(app_name, model).model_class().get(id = object_id).images.all()
     images = [i.image for i in ias]
-    if (request.is_ajax()):
+    if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", images), mimetype = "application/json")
     else:
         return render_to_response('gallery/image/list.html', context_instance = RequestContext(Request, {'images': image}))

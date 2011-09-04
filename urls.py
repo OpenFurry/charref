@@ -5,6 +5,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('charref.characters.views',
     (r'^$', 'front'),
+    (r'^ng/', 'ng'),
 
     (r'^~(?P<username>[a-zA-Z0-9\-_]+)/$', 'show_user'),
     (r'^profile/edit/$', 'edit_user'),

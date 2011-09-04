@@ -9,21 +9,17 @@ from charref.characters.models import *
 from charref.activitystream.models import *
 
 def front(request):
-    return render_to_response('base.html', context_instance = RequestContext(request, {}))
+    return render_to_response('front.html', context_instance = RequestContext(request, {}))
+
+def ng(request):
+    return render_to_response('front-ng.html', context_instance = RequestContext(request, {}))
 
 def show_user(request, username):
     user = get_object_or_404(User, username = username)
-    if (request.user != user):
-        si = StreamItem(
-                action_type = 'R',
-                user = request.user,
-                content_type = ContentType.objects.get_for_model(User),
-                object_id = user.id)
-        #si.save()
-        if (request.is_ajax()):
-            return HttpResponse(serializers.serialize("json", user), mimetype = "application/json")
-        else:
-            return render_to_response('characters/user/show.html', context_instance = RequestContext(request, {'user': user}))
+    if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
+        return HttpResponse(serializers.serialize("json", (user,)), mimetype = "application/json")
+    else:
+        return render_to_response('characters/user/show.html', context_instance = RequestContext(request, {'user_object': user}))
 
 @login_required
 def edit_user(request):
@@ -39,7 +35,7 @@ def edit_user(request):
                     object_id = user.id)
             si.save()
             return HttpResponseRedirect("/~%s" % request.user.username)
-    return render_to_response("characters/user/edit.html", context_instance = RequestContext(request, {'form': form}))
+    return render_to_response("characters/user/show.html", context_instance = RequestContext(request, {'form': form}))
 
 def register(request):
     if request.method == 'POST': 
@@ -74,14 +70,14 @@ def list_characters(request):
     except (EmptyPage, InvalidPage):
         logs = paginator.page(paginator.num_pages)
 
-    if (request.is_ajax()):
+    if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", characters), mimetype = "application/json")
     else:
         return render_to_response('characters/character/list.html', context_instance = RequestContext(request, {'characters': characters}))
 
 def list_characters_for_user(request, username):
     characters = Character.objects.filter(user__username__exact = username)
-    if (request.is_ajax()):
+    if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", characters), mimetype = "application/json")
     else:
         # Shouldn't ever really happen, this is mostly here for AJAX requests
@@ -89,15 +85,8 @@ def list_characters_for_user(request, username):
 
 def show_character(request, character_id):
     character = get_object_or_404(Character, id = character_id)
-    if (request.user != character.user):
-        si = StreamItem(
-                action_type = 'R',
-                user = request.user,
-                content_type = ContentType.get_for_model(Character),
-                object_id = character_id)
-        #si.save()
-    if (request.is_ajax()):
-        return HttpResponse(serializers.serialize("json", character), mimetype = "application/json")
+    if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
+        return HttpResponse(serializers.serialize("json", (character,)), mimetype = "application/json")
     else:
         return render_to_response('characters/character/show.html', context_instance = RequestContext(request, {'character': character}))
 
@@ -161,22 +150,15 @@ def create_character(request, character_id):
 
 def list_morphs_for_character(request, character_id):
     morphs = Morph.objects.filter(character__id__exact = character_id)
-    if (request.is_ajax()):
+    if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", morphs), mimetype = "application/json")
     else:
         return render_to_response('morphs/morph/list.html', context_instance = RequestContext(request, {}))
 
 def show_morph(request, morph_id):
     morph = get_object_or_404(Morph, id = morph_id)
-    if (request.user != morph.user):
-        si = StreamItem(
-                action_type = 'R',
-                user = request.user,
-                content_type = ContentType.get_for_model(Morph),
-                object_id = character_id)
-        #si.save()
-    if (request.is_ajax()):
-        return HttpResponse(serializers.serialize("json", morph), mimetype = "application/json")
+    if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
+        return HttpResponse(serializers.serialize("json", (morph,)), mimetype = "application/json")
     else:
         return render_to_response('characters/morph/show.html', context_instance = RequestContext(request,  {'morph': morph}))
 
@@ -247,22 +229,15 @@ def create_morph(request):
 
 def list_descriptions_for_morph(request, morph_id):
     descriptions = Description.objects.filter(morph__id__exact = morph_id)
-    if (request.is_ajax()):
+    if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", description), mimetype = "application/json")
     else:
         return render_to_response("characters/descriptions/list.html", context_instance = RequestContext(request, {"description": description}))
 
 def show_description(request, description_id):
     description = get_object_or_404(Description, id = description_id)
-    if (request.user != description.user):
-        si = StreamItem(
-                action_type = 'R',
-                user = request.user,
-                content_type = ContentType.get_for_model(Description),
-                object_id = description_id)
-        #si.save()
-    if (request.is_ajax()):
-        return HttpResponse(serializers.serialize("json", description), mimetype = "application/json")
+    if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
+        return HttpResponse(serializers.serialize("json", (description,)), mimetype = "application/json")
     else:
         return render_to_response('characters/description/show.html', context_instance = RequestContext(request, {'description': description}))
 
@@ -342,22 +317,15 @@ def list_locations(request):
     except (EmptyPage, InvalidPage):
         logs = paginator.page(paginator.num_pages)
 
-    if (request.is_ajax()):
+    if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", locations), mimetype = "application/json")
     else:
         return render_to_response('characters/location/list.html', context_instance = RequestContext(request, {'locations': locations}))
 
 def show_location(request, location_id):
     location = get_object_or_404(Location, id = location_id)
-    if (request.user != location.user):
-        si = StreamItem(
-                action_type = 'R',
-                user = request.user,
-                content_type = ContentType.get_for_model(Location),
-                object_id = character_id)
-        #si.save()
-    if (request.is_ajax()):
-        return HttpResponse(serializers.serialize("json", location), mimetype = "application/json")
+    if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
+        return HttpResponse(serializers.serialize("json", (location,)), mimetype = "application/json")
     else:
         return render_to_response('characters/location/show.html', context_instance = RequestContext(request, {'location': location}))
 

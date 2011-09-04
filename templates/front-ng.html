@@ -1,6 +1,8 @@
-<html>
+<!doctype html>
+
+<html xmlns:ng="http://angularjs.org">
     <head>
-        <title>{% block title %}{% endblock %}Characters @ OpenFurry</title>
+        <title>Characters @ OpenFurry</title>
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,17 +11,21 @@
         <![endif]-->
         <link rel="stylesheet" type="text/css" href="http://lib.jnsq.us/GGS" />
         <script type="text/javascript" src="http://lib.jnsq.us/jquery/1.6.2"></script>
-        <script type="text/javascript" src="http://lib.jnsq.us/GGS-scriptlet"></script>
-        {% block head %}{% endblock %}
+        <script type="text/javascript" src="/angular-0.9.19.js" ng:autobind></script>
+        <script type="text/javascript" src="/controllers.js"></script>
     </head>
     <body>
         <header>
             <div class="wrapper">
                 <h1>Characters</h1>
-                <h2>{% block header %}{% endblock %}</h2>
+                <h2></h2>
             </div>
         </header>
 
-        {% block content %}{% endblock %}
+        <div class="wrapper" ng:controller="CharactersCtrl">
+            <ng:view></ng:view>
+        </div>
 
+        dja&lt;ng/&gt;o
+    </body>
 </html>
