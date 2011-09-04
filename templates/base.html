@@ -1,0 +1,20 @@
+<!doctype html>
+
+<html xmlns:ng="http://angularjs.org">
+    <head>
+        <title>Characters @ OpenFurry</title>
+        <script type="text/javascript" src="http://code.angularjs.org/0.9.19/angular-0.9.19.min.js" ng:autobind></script>
+        <script type="text/javascript">
+            function CharactersCtrl($route) {
+                var self = this;
+                self.testModel = [1, 2, 3, 4, 5];
+            }
+        </script>
+    </head>
+    <body ng:controller="CharactersCtrl">
+        <h1>Characters!</h1>
+        <ul>
+            <li ng:repeat="num in testModel">{% templatetag openvariable %} num {% templatetag closevariable %}</li>
+        </ul>
+    </body>
+</html>
