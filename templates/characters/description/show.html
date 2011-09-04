@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}{{ description.name }} (description) - {% endblock %}
+
+{% block header %}<a href="/~{{ description.user.username }}">~{{ description.user.username }}</a> / <a href="{{ description.morph.character.get_absolute_url }}">{{ description.morph.character.name }}</a> / <a href="{{ description.morph.get_absolute_url }}">{{ description.morph.gender }} {{ description.morph.species_text }}</a> / {{ description.name }}{% endblock %}
+
+{% block content %}
+<article id="twoway">
+    <section class="wrapper">
+        <h3>Stats</h3>
+        <p><strong>Description name:</strong> {{ description.name }}</p>
+        <p><strong>Description rating:</strong> {{ description.get_rating_display }}</p>
+        <p><strong>Description owner:</strong> <a href="/~{{ morph.user.username }}">{{ description.user.username }}</a></p>
+        <div>
+            <h3>Activity stream</h3>
+            <ul>
+                {% for si in description.stream_items.all %}
+                    <li class="{% cycle "odd" "even" %}"><a href="/~{{ si.user.username }}">~{{ si.user.username }}</a> {{ si.get_action_type_display }} {{ description.name }} (description)</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+    <section class="wrapper">
+        <h3>Description</h3>
+        <div>
+            {{ description.description|linebreaks }}
+        </div>
+    </section>
+    <section class="wrapper">
+        <h3>Images</h3>
+        {% for image in morph.images.all %}
+            {{ image }}
+        {% endfor %}
+    </section>
+</article>
+{% endblock %}

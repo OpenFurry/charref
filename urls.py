@@ -8,7 +8,7 @@ urlpatterns = patterns('charref.characters.views',
     (r'^ng/', 'ng'),
 
     (r'^~(?P<username>[a-zA-Z0-9\-_]+)/$', 'show_user'),
-    (r'^profile/edit/$', 'edit_user'),
+    (r'^~(?P<username>[a-zA-Z0-9\-_]+)/edit/$', 'edit_user'),
     (r'^register/$', 'register'),
     (r'^users/$', 'list_users'),
 
@@ -18,25 +18,25 @@ urlpatterns = patterns('charref.characters.views',
     (r'^m(orph)?/(?P<morph_id>\d+)/descriptions/$', 'list_descriptions_for_morph'),
     (r'^locations/$', 'list_locations'),
 
+    (r'^character/create/$', 'create_character'),
+    (r'^morph/create/$', 'create_morph'),
+    (r'^description/create/$', 'create_description'),
+    (r'^location/create/$', 'create_location'),
+
     (r'^c(haracter)?/(?P<character_id>\d+)/$', 'show_character'),
     (r'^m(orph)?/(?P<morph_id>\d+)/$', 'show_morph'),
-    (r'^d(escription)?/(?P<desc_id>\d+)/$', 'show_description'),
+    (r'^d(escription)?/(?P<description_id>\d+)/$', 'show_description'),
     (r'^l(ocation)?/(?P<location_id>\d+)/$', 'show_location'),
 
     (r'^c(haracter)?/(?P<character_id>\d+)/edit/$', 'edit_character'),
     (r'^m(orph)?/(?P<morph_id>\d+)/edit/$', 'edit_morph'),
-    (r'^d(escription)?/(?P<desc_id>\d+)/edit/$', 'edit_description'),
+    (r'^d(escription)?/(?P<description_id>\d+)/edit/$', 'edit_description'),
     (r'^l(ocation)?/(?P<location_id>\d+)/edit/$', 'edit_location'),
 
     (r'^c(haracter)?/(?P<character_id>\d+)/delete/$', 'delete_character'),
     (r'^m(orph)?/(?P<morph_id>\d+)/delete/$', 'delete_morph'),
-    (r'^d(escription)?/(?P<desc_id>\d+)/delete/$', 'delete_description'),
+    (r'^d(escription)?/(?P<description_id>\d+)/delete/$', 'delete_description'),
     (r'^l(ocation)?/(?P<location_id>\d+)/delete$', 'delete_location'),
-
-    (r'^c(haracter)?/create/$', 'create_character'),
-    (r'^m(orph)?/create/$', 'create_morph'),
-    (r'^d(escription)?/create/$', 'create_description'),
-    (r'^l(ocation)?/create/$', 'create_location'),
 
     (r'^_species/$', 'ajax_list_species')
 )

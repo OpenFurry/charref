@@ -2,10 +2,12 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes import generic
 from charref.gallery.models import ImageAttachment
+from charref.activitystream.models import *
 
 class Character(models.Model):
     name = models.CharField(max_length = 60)
     user = models.ForeignKey(User)
+    stream_items = generic.GenericRelation(StreamItem)
     images = generic.GenericRelation(ImageAttachment)
 
     def get_absolute_url(self):
@@ -17,6 +19,7 @@ class Morph(models.Model):
     gender = models.CharField(max_length = 20)
     species_text = models.CharField(max_length = 60)
     species_category = models.ForeignKey('SpeciesCategory')
+    stream_items = generic.GenericRelation(StreamItem)
     images = generic.GenericRelation(ImageAttachment)
 
     def get_absolute_url(self):
@@ -34,6 +37,7 @@ class Description(models.Model):
     name = models.CharField(max_length = 30)
     description = models.TextField()
     rating = models.CharField(max_length = 1, choices = RATINGS)
+    stream_items = generic.GenericRelation(StreamItem)
     images = generic.GenericRelation(ImageAttachment)
 
     def get_absolute_url(self):
@@ -43,6 +47,7 @@ class Location(models.Model):
     name = models.CharField(max_length = 120)
     description = models.TextField()
     user = models.ForeignKey(User)
+    stream_items = generic.GenericRelation(StreamItem)
     images = generic.GenericRelation(ImageAttachment)
 
     def get_absolute_url(self):
@@ -54,4 +59,4 @@ class CharacterLocation(models.Model):
 
 class SpeciesCategory(models.Model):
     name = models.CharField(max_length = 50)
-    parent = models.ForeignKey('SpeciesCategory')
+    parent = models.ForeignKey('SpeciesCategory', null = True)

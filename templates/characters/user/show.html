@@ -2,7 +2,7 @@
 
 {% block title %}{{ user_object.username }} (user) - {% endblock %}
 
-{% block header %}User: {% if not user_object.is_active %}<s>{% endif %}{{ user_object.username }}{% if not user_object.is_active %}</s>{% endif %}{% endblock %}
+{% block header %}~{% if not user_object.is_active %}<s>{% endif %}{{ user_object.username }}{% if not user_object.is_active %}</s>{% endif %}{% endblock %}
 
 {% block content %}
 <article id="twoway">
@@ -20,20 +20,23 @@
         {% if user == user_object %}
             <div class="hide" id="updateform">
                 <hr />
-                <form method="post" action="/~{{ user.username }}/edit">
+                {% for error in form.errors %}
+                    {{ error }}
+                {% endfor %}
+                <form method="post" action="/~{{ user.username }}/edit/">
                     {% csrf_token %}
                     <table>
                         <tr>
                             <th><label for="firstname">First name:</label></th>
-                            <td><input type="text" name="firstname" value="{{ user.first_name }}" /></td>
+                            <td><input type="text" name="first_name" value="{{ user.first_name }}" /></td>
                         </tr>
                         <tr>
                             <th><label for="firstname">Last name:</label></th>
-                            <td><input type="text" name="firstname" value="{{ user.last_name }}" /></td>
+                            <td><input type="text" name="last_name" value="{{ user.last_name }}" /></td>
                         </tr>
                         <tr>
                             <th><label for="firstname">E-mail:</label></th>
-                            <td><input type="text" name="firstname" value="{{ user.email }}" /></td>
+                            <td><input type="text" name="email" value="{{ user.email }}" /></td>
                         </tr>
                         <tr>
                             <td colspan="2"><input type="submit" value="Save" /></td>
@@ -46,8 +49,22 @@
     <section class="wrapper">
         <h3>Characters</h3>
         {% for character in user_object.character_set.all %}
-            <a href="{{ character.get_absolute_url }}">{{ character.name }}</a>
+            <p><a href="{{ character.get_absolute_url }}">{{ character.name }}</a> - <a href="{{character.get_absolute_url }}/delete/">[X]</a></p>
         {% endfor %}
+        {% if user == user_object %}
+            <form method="post" action="/character/create/">
+                {% csrf_token %}
+                <table>
+                    <tr>
+                        <th><label for="name">Character name:</label></th>
+                        <td><input type="text" name="name" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><input type="submit" value="Create character" /></td>
+                    </tr>
+                </table>
+            </form>
+        {% endif %}
     </section>
     <section class="wrapper">
         <h3>Images</h3>

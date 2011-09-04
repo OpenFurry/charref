@@ -5,7 +5,8 @@ from charref.characters.models import *
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        exclude = ('username', 'password')
+        #exclude = ('username', 'password', 'last_login', 'date_joined', 'is_active', 'is_staff', 'is_superuser')
+        fields = ('first_name', 'last_name', 'email')
 
 class CharacterForm(forms.ModelForm):
     class Meta:

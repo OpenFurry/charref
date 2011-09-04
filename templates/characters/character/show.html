@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{{ character.name }} (character) - {% endblock %}
+
+{% block header %}<a href="/~{{ character.user.username }}">~{{ character.user.username }}</a> / {{ character.name }}{% endblock %}
+
+{% block content %}
+<article id="twoway">
+    <section class="wrapper">
+        <h3>Stats</h3>
+        <p><strong>Character name:</strong> {{ character.name }}</p>
+        <p><strong>Character owner:</strong> <a href="/~{{ character.user.username }}">{{ character.user.username }}</a></p>
+        <div>
+            <ul>
+                {% for si in character.stream_items.all %}
+                    <li class="{% cycle "odd" "even" %}"><a href="/~{{ si.user.username }}">~{{ si.user.username }}</a> {{ si.get_action_type_display }} {{ character.name }} (character)</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+    <section class="wrapper">
+        <h3>Morphs</h3>
+        {% for morph in character.morph_set.all %}
+            <p><a href="{{ morph.get_absolute_url }}">{{ morph.gender }} {{ morph.species_text }}</a> - <a href="{{ morph.get_absolute_url }}/delete">[X]</a></p>
+        {% endfor %}
+        {% if user == character.user %}
+            <hr />
+            <a href="javascript:void(0)" onclick="$('#createMorph').toggle()">+ Add morph</a>
+            <form method="post" action="/morph/create/" id="createMorph" style="display: none">
+                {% csrf_token %}
+                <input type="hidden" name="character" value="{{ character.id }}" />
+                <table>
+                    <tr>
+                        <th><label for="gender">Gender:</label></th>
+                        <td><input type="text" name="gender" /></td>
+                    </tr>
+                    <tr>
+                        <th><label for="species_category">Species category</label></th>
+                        <td><input type="hidden" name="species_category" value="1" />Not Yet Implemented</td>
+                    </tr>
+                    <tr>
+                        <th><label for="species_text">Species:</label></th>
+                        <td><input type="text" name="species_text" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><input type="submit" value="Create morph" /></td>
+                    </tr>
+                </table>
+            </form>
+        {% endif %}
+    </section>
+    <section class="wrapper">
+        <h3>Images</h3>
+        {% for image in character.images.all %}
+            {{ image }}
+        {% endfor %}
+    </section>
+</article>
+{% endblock %}

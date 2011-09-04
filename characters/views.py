@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from charref.characters.models import *
+from charref.characters.forms import *
 from charref.activitystream.models import *
 
 def front(request):
@@ -22,7 +23,10 @@ def show_user(request, username):
         return render_to_response('characters/user/show.html', context_instance = RequestContext(request, {'user_object': user}))
 
 @login_required
-def edit_user(request):
+def edit_user(request, username):
+    if (request.user.username != username):
+        request.user.message_set.create(message = '<div class="error">You may only edit yourself!</div>')
+        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
     form = UserForm(instance = request.user)
     if (request.method == 'POST'):
         form = UserForm(request.POST, instance = request.user)
@@ -32,10 +36,10 @@ def edit_user(request):
                     action_type = 'U',
                     user = request.user,
                     content_type = ContentType.objects.get_for_model(User),
-                    object_id = user.id)
+                    object_id = request.user.id)
             si.save()
             return HttpResponseRedirect("/~%s" % request.user.username)
-    return render_to_response("characters/user/show.html", context_instance = RequestContext(request, {'form': form}))
+    return render_to_response("characters/user/show.html", context_instance = RequestContext(request, {'form': form, 'user_object': request.user}))
 
 def register(request):
     if request.method == 'POST': 
@@ -101,10 +105,10 @@ def edit_character(request, character_id):
         si = StreamItem(
                 action_type = 'U',
                 user = request.user,
-                content_type = ContentType.get_for_model(Character),
+                content_type = ContentType.objects.get_for_model(Character),
                 object_id = character_id)
         si.save()
-        return HttpResponseRedirect(c.get_aboslute_url())
+        return HttpResponseRedirect(c.get_absolute_url())
     else:
         request.user.message_set.create(message = '<div class="error">You must enter a name!</div>')
         return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {}))
@@ -116,12 +120,16 @@ def delete_character(request, character_id):
         #TODO StreamItem flagging user for attempting to delete a character not theirs
         request.user.message_set.create(message = '<div class="error">You may only delete your own characters!</div>')
         return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
-    if (request.POST.get('confirm', None) == "yes"):
+    if (request.POST.get('confirm', None) is not None):
+        for morph in character.morph_set.all():
+            for description in morph.description_set.all():
+                description.delete()
+            morph.delete()
         character.delete()
         si = StreamItem(
                 action_type = 'D',
                 user = request.user,
-                content_type = ContentType.get_for_model(Character),
+                content_type = ContentType.objects.get_for_model(Character),
                 object_id = character_id)
         si.save()
         return HttpResponseRedirect("/~%s" % request.user.username)
@@ -134,14 +142,15 @@ def create_character(request, character_id):
         return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {}))
     if (request.POST.get('name', None) is not None):
         c = Character(name = request.POST['name'])
+        c.user = request.user
         c.save()
         si = StreamItem(
                 action_type = 'C',
                 user = request.user,
-                content_type = ContentType.get_for_model(Character),
-                object_id = character_id)
+                content_type = ContentType.objects.get_for_model(Character),
+                object_id = c.id)
         si.save()
-        return HttpResponseRedirect(c.get_aboslute_url())
+        return HttpResponseRedirect(c.get_absolute_url())
     else:
         request.user.message_set.create(message = '<div class="error">You must enter a name!</div>')
         return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {}))
@@ -177,7 +186,7 @@ def edit_morph(request, morph_id):
             si = StreamItem(
                     action_type = 'U',
                     user = request.user,
-                    content_type = ContentType.get_for_model(Morph),
+                    content_type = ContentType.objects.get_for_model(Morph),
                     object_id = morph_id)
             si.save()
             return HttpResponseRedirect(morph.get_absolute_url())
@@ -190,14 +199,22 @@ def delete_morph(request, morph_id):
         #TODO flag user
         request.user.message_set.create(message = '<div class="error">You may only delete a morph that belongs to you!</div>')
         return render_to_response("permission_denied.html", context_instance = RequestContext(request))
-    if (request.method == "POST" and request.POST.get("confirm", None) == "yes"):
+    if (request.method == "POST" and request.POST.get("confirm", None) is not None):
         character = morph.character
+        for description in morph.description_set.all():
+            description.delete()
         morph.delete()
         si = StreamItem(
                 action_type = 'D',
                 user = request.user,
-                content_type = ContentType.get_for_model(Morph),
+                content_type = ContentType.objects.get_for_model(Morph),
                 object_id = morph_id)
+        si.save()
+        si = StreamItem(
+                action_type = 'MD',
+                user = request.user,
+                content_type = ContentType.objects.get_for_model(Character),
+                object_id = character.id)
         si.save()
         return HttpResponseRedirect(character.get_absolute_url())
     else:
@@ -205,6 +222,7 @@ def delete_morph(request, morph_id):
 
 @login_required
 def create_morph(request):
+    form = MorphForm()
     if (request.method == "POST"):
         form = MorphForm(request.POST)
         if (form.is_valid()):
@@ -219,11 +237,17 @@ def create_morph(request):
             si = StreamItem(
                     action_type = 'C',
                     user = request.user,
-                    content_type = ContentType.get_for_model(Morph),
+                    content_type = ContentType.objects.get_for_model(Morph),
                     object_id = morph.id)
             si.save()
+            si = StreamItem(
+                    action_type = 'MA',
+                    user = request.user,
+                    content_type = ContentType.objects.get_for_model(Character),
+                    object_id = morph.character.id)
+            si.save()
             return HttpResponseRedirect(morph.get_absolute_url())
-    return render_to_response('characters/morph/edit.html', context_instance = RequestContext(request, {'form': MorphForm(instance = morph)}))
+    return render_to_response('characters/character/show.html', context_instance = RequestContext(request, {'form': form}))
 
 ##
 
@@ -252,7 +276,7 @@ def edit_description(request, description_id):
             si = StreamItem(
                     action_type = 'U',
                     user = request.user,
-                    content_type = ContentType.get_for_model(Description),
+                    content_type = ContentType.objects.get_for_model(Description),
                     object_id = description_id)
             si.save()
             return HttpResponseRedirect(description.get_absolute_url())
@@ -266,17 +290,23 @@ def delete_description(request, description_id):
     if (request.user != description.user):
         request.user.message_set.create(message = '<div class="error">You may only delete descriptions that belong to you!</div>')
         return render_to_response("permission_denied.html", context_instance = RequestContext(request, {}))
-    if (request.method == "POST" and request.POST.get("confirm", None) == "yes"):
+    if (request.method == "POST" and request.POST.get("confirm", None) is not None):
         morph = description.morph
         description.delete()
         si = StreamItem(
                 action_type = 'D',
                 user = request.user,
-                content_type = ContentType.get_for_model(Description),
+                content_type = ContentType.objects.get_for_model(Description),
                 object_id = description_id)
         si.save()
+        si = StreamItem(
+                action_type = 'DD',
+                user = request.user,
+                content_type = ContentType.objects.get_for_model(Morph),
+                object_id = morph.id)
+        si.save()
         return HttpResponseRedirect(morph.get_absolute_url())
-    return render_to_response("characters/description/delete.html", context_instance = RequestContext(request, {}))
+    return render_to_response("characters/description/delete.html", context_instance = RequestContext(request, {'description': description}))
 
 @login_required
 def create_description(request):
@@ -295,8 +325,14 @@ def create_description(request):
             si = StreamItem(
                     action_type = 'C',
                     user = request.user,
-                    content_type = ContentType.get_for_model(Description),
+                    content_type = ContentType.objects.get_for_model(Description),
                     object_id = description.id)
+            si.save()
+            si = StreamItem(
+                    action_type = 'DA',
+                    user = request.user,
+                    content_type = ContentType.objects.get_for_model(Morph),
+                    object_id = description.morph.id)
             si.save()
             return HttpResponseRedirect(description.get_absolute_url())
     return render_to_response("characters/description/edit.html", context_instance = RequestContext(request, {'form': form}))
@@ -344,7 +380,7 @@ def edit_location(request, location_id):
             si = StreamItem(
                     action_type = 'U',
                     user = request.user,
-                    content_type = ContentType.get_for_model(Location),
+                    content_type = ContentType.objects.get_for_model(Location),
                     object_id = character_id)
             si.save()
             return HttpResponseRedirect(location.get_absolute_url())
@@ -362,7 +398,7 @@ def delete_location(request, location_id):
         si = StreamItem(
                 action_type = 'D',
                 user = request.user,
-                content_type = ContentType.get_for_model(Location),
+                content_type = ContentType.objects.get_for_model(Location),
                 object_id = location_id)
         si.save()
         return HttpResponseRedirect('/')
@@ -381,7 +417,7 @@ def create_location(request):
             si = StreamItem(
                     action_type = 'C',
                     user = request.user,
-                    content_type = ContentType.get_for_model(Location),
+                    content_type = ContentType.objects.get_for_model(Location),
                     object_id = location.id)
             si.save()
             return HttpResponseRedirect(location.get_absolute_url())

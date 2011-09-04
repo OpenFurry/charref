@@ -8,9 +8,13 @@ class StreamItem(models.Model):
             ('C', 'created'),
             ('R', 'viewed'),
             ('U', 'edited'),
-            ('D', 'deletead'),
-            ('IA', 'image attached'),
-            ('ID', 'image detached')
+            ('D', 'deleted'),
+            ('IA', 'attached an image to'),
+            ('ID', 'detached an image from'),
+            ('MA', 'added a morph to'),
+            ('MD', 'removed a morph from'),
+            ('DA', 'added a description to'),
+            ('DD', 'removed a description from')
             )
 
     action_time = models.DateTimeField(auto_now_add = True)
@@ -20,3 +24,6 @@ class StreamItem(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        ordering = ['-action_time']

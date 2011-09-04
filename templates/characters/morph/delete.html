@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Delete: {{ morph.gender }} {{ morph.species_text }} (morph) - {% endblock %}
+
+{% block header %}Delete morph: {{ morph.gender }} {{ morph.species_text }} from {{ morph.character.name }}{% endblock %}
+
+{% block content %}
+<article id="twoway">
+    <section class="wrapper">
+        <h3>Confirm!</h3>
+        <p>Please make sure you really want to delete this morph!  This action cannot be undone, and will delete descriptions attached to that character!  Images will be detached, but remain uploaded - you can delete them separately.</p>
+    </section>
+    <section class="wrapper">
+        <h3>I agree</h3>
+        <p>I understand that this will delete my morph and all descriptions associated with it.</p>
+        <form method="post">
+            {% csrf_token %}
+            <p><input type="checkbox" name="confirm" /> <label for="confirm"><strong>I agree</strong></label></p>
+            <p><input type="submit" value="Delete morph" /></p>
+        </form>
+    </section>
+</article>
+{% endblock %}
