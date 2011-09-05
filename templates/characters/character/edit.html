@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Character - {% endblock %}
+
+{% block header %}Edit Character{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+    <form method="post" action=".">
+        {% csrf_token %}
+        <tr>
+            <th><label for="name">Character name</label></th>
+            <td><input type="text" name="name" value="{{ character.name }}" /></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align: center"><input type="submit" value="Save Character" /></td>
+        </tr>
+    </form>
+</div>
+{% endblock %}

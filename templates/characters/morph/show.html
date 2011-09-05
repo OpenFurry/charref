@@ -1,17 +1,20 @@
 {% extends "base.html" %}
 
-{% block title %}{{ morph.name }} (morph) - {% endblock %}
+{% block title %}{{ morph.gender }} {{ morph.species_text }} (morph) - {% endblock %}
 
 {% block header %}<a href="/~{{ morph.user.username }}">~{{ morph.user.username }}</a> / <a href="{{ morph.character.get_absolute_url }}">{{ morph.character.name }}</a> / {{ morph.gender }} {{ morph.species_text }}{% endblock %}
 
 {% block content %}
-<article id="twoway">
-    <section class="wrapper">
+<div id="twoway">
+    <div class="wrapper">
         <h3>Stats</h3>
         <p><strong>Morph gender:</strong> {{ morph.gender }}</p>
         <p><strong>Morph species text:</strong> {{ morph.species_text }}</p>
         <p><strong>Morph species category:</strong> {{ morph.species_category.name }}</p>
         <p><strong>Morph owner:</strong> <a href="/~{{ morph.user.username }}">{{ morph.user.username }}</a></p>
+        {% if morph.user == user %}
+        <p><a href="{{ morph.get_absolute_url }}/edit">Edit this morph</a></p>
+        {% endif %}
         <div>
             <h3>Activity stream</h3>
             <ul>
@@ -20,8 +23,8 @@
                 {% endfor %}
             </ul>
         </div>
-    </section>
-    <section class="wrapper">
+    </div>
+    <div class="wrapper">
         <h3>Descriptions</h3>
         {% for description in morph.description_set.all %}
             <p><a href="{{ description.get_absolute_url }}">{{ description.name }}</a> - <a href="{{ description.get_absolute_url }}/delete">[X]</a></p>
@@ -57,12 +60,12 @@
                 </table>
             </form>
         {% endif %}
-    </section>
-    <section class="wrapper">
+    </div>
+    <div class="wrapper">
         <h3>Images</h3>
         {% for image in morph.images.all %}
             {{ image }}
         {% endfor %}
-    </section>
-</article>
+    </div>
+</div>
 {% endblock %}

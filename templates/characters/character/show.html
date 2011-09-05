@@ -5,11 +5,14 @@
 {% block header %}<a href="/~{{ character.user.username }}">~{{ character.user.username }}</a> / {{ character.name }}{% endblock %}
 
 {% block content %}
-<article id="twoway">
-    <section class="wrapper">
+<div id="twoway">
+    <div class="wrapper">
         <h3>Stats</h3>
         <p><strong>Character name:</strong> {{ character.name }}</p>
         <p><strong>Character owner:</strong> <a href="/~{{ character.user.username }}">{{ character.user.username }}</a></p>
+        {% if character.user == user %}
+        <p><a href="{{ character.get_absolute_url }}/edit">Edit this character</a></p>
+        {% endif %}
         <div>
             <ul>
                 {% for si in character.stream_items.all %}
@@ -17,8 +20,8 @@
                 {% endfor %}
             </ul>
         </div>
-    </section>
-    <section class="wrapper">
+    </div>
+    <div class="wrapper">
         <h3>Morphs</h3>
         {% for morph in character.morph_set.all %}
             <p><a href="{{ morph.get_absolute_url }}">{{ morph.gender }} {{ morph.species_text }}</a> - <a href="{{ morph.get_absolute_url }}/delete">[X]</a></p>
@@ -48,12 +51,12 @@
                 </table>
             </form>
         {% endif %}
-    </section>
-    <section class="wrapper">
+    </div>
+    <div class="wrapper">
         <h3>Images</h3>
         {% for image in character.images.all %}
             {{ image }}
         {% endfor %}
-    </section>
-</article>
+    </div>
+</div>
 {% endblock %}

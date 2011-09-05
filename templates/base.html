@@ -9,22 +9,26 @@
         <![endif]-->
         <link rel="stylesheet" type="text/css" href="http://lib.jnsq.us/GGS" />
         <link rel="stylesheet" type="text/css" href="/base.css" />
+        <link rel="stylesheet" type="text/css" href="/ui/css/custom-theme/jquery-ui-1.8.16.custom.css" />
         <script type="text/javascript" src="http://lib.jnsq.us/jquery/1.6.2"></script>
-        <script type="text/javascript" src="http://lib.jnsq.us/GGS-scriptlet"></script>
+        <script type="text/javascript" src="/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+        <!--<script type="text/javascript" src="http://lib.jnsq.us/GGS-scriptlet"></script>-->
         {% block head %}{% endblock %}
     </head>
     <body>
-        <header>
+        <div class="ui-helper-clearfix" id="header">
             <div class="wrapper">
-                <h1>Characters</h1>
+                <h1><a href="/">Characters</a></h1>
                 <h2>{% block header %}{% endblock %}</h2>
             </div>
-        </header>
+        </div>
 
-        {% block content %}{% endblock %}
+        <div class="ui-helper-clearfix">
+            {% block content %}{% endblock %}
+        </div>
 
-        <footer class="wrapper">
+        <div id="footer" class="wrapper ui-helper-clearfix">
             Powered by charref.jnsq.us - a <img src="http://lib.jnsq.us/jnsq-logo.png" /> project
-        </footer>
+        </div>
     </body>
 </html>

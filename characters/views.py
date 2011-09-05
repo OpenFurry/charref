@@ -6,11 +6,19 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from charref.characters.models import *
+from charref.gallery.models import Image
 from charref.characters.forms import *
 from charref.activitystream.models import *
 
 def front(request):
-    return render_to_response('front.html', context_instance = RequestContext(request, {}))
+    counts = {
+            'users': User.objects.count(),
+            'characters': Character.objects.count(),
+            'morphs': Morph.objects.count(),
+            'descriptions': Description.objects.count(),
+            'images': Image.objects.count()
+            }
+    return render_to_response('front.html', context_instance = RequestContext(request, {'counts': counts}))
 
 def ng(request):
     return render_to_response('front-ng.html', context_instance = RequestContext(request, {}))
@@ -96,22 +104,21 @@ def show_character(request, character_id):
 
 @login_required
 def edit_character(request, character_id):
-    if (request.method == "GET"):
-        return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {}))
-    if (request.POST.get('name', None) is not None):
-        c = get_object_or_404(Character, id = character_id)
-        c.name = request.POST['name']
-        c.save()
-        si = StreamItem(
-                action_type = 'U',
-                user = request.user,
-                content_type = ContentType.objects.get_for_model(Character),
-                object_id = character_id)
-        si.save()
-        return HttpResponseRedirect(c.get_absolute_url())
-    else:
-        request.user.message_set.create(message = '<div class="error">You must enter a name!</div>')
-        return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {}))
+    c = get_object_or_404(Character, id = character_id)
+    if (request.method == "POST"):
+        if (request.POST.get('name', None) is not None):
+            c.name = request.POST['name']
+            c.save()
+            si = StreamItem(
+                    action_type = 'U',
+                    user = request.user,
+                    content_type = ContentType.objects.get_for_model(Character),
+                    object_id = character_id)
+            si.save()
+            return HttpResponseRedirect(c.get_absolute_url())
+        else:
+            request.user.message_set.create(message = '<div class="error">You must enter a name!</div>')
+    return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {'character': c}))
 
 @login_required
 def delete_character(request, character_id):
@@ -190,7 +197,7 @@ def edit_morph(request, morph_id):
                     object_id = morph_id)
             si.save()
             return HttpResponseRedirect(morph.get_absolute_url())
-    return render_to_response('characters/morph/edit.html', context_instance = RequestContext(request, {'form': form}))
+    return render_to_response('characters/morph/edit.html', context_instance = RequestContext(request, {'form': form, 'species_category': _species_select_dropdown(morph.species_category.id)}))
 
 @login_required
 def delete_morph(request, morph_id):
@@ -247,7 +254,7 @@ def create_morph(request):
                     object_id = morph.character.id)
             si.save()
             return HttpResponseRedirect(morph.get_absolute_url())
-    return render_to_response('characters/character/show.html', context_instance = RequestContext(request, {'form': form}))
+    return render_to_response('characters/morph/edit.html', context_instance = RequestContext(request, {'form': form, 'species_category':  _species_select_dropdown()}))
 
 ##
 
@@ -280,8 +287,6 @@ def edit_description(request, description_id):
                     object_id = description_id)
             si.save()
             return HttpResponseRedirect(description.get_absolute_url())
-        else:
-            return
     return render_to_response('characters/description/edit.html', context_instance = RequestContext(request, {'form': form}))
 
 @login_required
@@ -427,3 +432,17 @@ def create_location(request):
 
 def ajax_list_species(request):
     pass
+
+##
+
+def _species_select_dropdown(selected = None):
+    to_return = '<select name="species_category">'
+    species = SpeciesCategory.objects.filter(parent__isnull = True)
+    for s in species:
+        to_return += '<optgroup label="%s">' % s.name
+        species2 = SpeciesCategory.objects.filter(parent = s)
+        for s2 in species2:
+            to_return += '<option value="%d"%s>%s</option>' % (s2.id, (s2.id == selected and ' selected="selected"' or ''), s2.name)
+        to_return += '</optgroup>'
+    to_return += '</select>'
+    return to_return

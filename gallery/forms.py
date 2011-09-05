@@ -1,10 +1,10 @@
-import django.forms
+from django import forms
 from charref.gallery.models import *
 
 class ImageForm(forms.ModelForm):
     class Meta:
         model = Image
-        exclude = ('owner',)
+        exclude = ('user','thumbnail')
 
 class ImageAttachmentForm(forms.ModelForm):
     class Meta:

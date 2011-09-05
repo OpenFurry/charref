@@ -5,8 +5,8 @@
 {% block header %}~{% if not user_object.is_active %}<s>{% endif %}{{ user_object.username }}{% if not user_object.is_active %}</s>{% endif %}{% endblock %}
 
 {% block content %}
-<article id="twoway">
-    <section class="wrapper">
+<div id="twoway">
+    <div class="wrapper">
         <h3>Stats</h3>
         <p><strong>Username:</strong> {% if not user_object.is_active %}<s>{% endif %}{{ user_object.username }}{% if not user_object.is_active %}</s>{% endif %}
             {% if user_object.is_superuser %}<em>Superuser!</em>{% else %}{% if user_object.is_staff %}<em>Staff!</em>{% endif %}{% endif %}
@@ -18,8 +18,9 @@
         <p><strong>Descriptions:</strong> {{ user_object.description_set.count }}
         <p><strong>Locations (as owner):</strong> {{ user_object.description_set.count }}
         {% if user == user_object %}
-            <div class="hide" id="updateform">
-                <hr />
+            <hr />
+            <a href="javascript:void(0)" onclick="$('#updateform').toggle()">Edit info</a>
+            <div id="updateform" style="display: none">
                 {% for error in form.errors %}
                     {{ error }}
                 {% endfor %}
@@ -45,14 +46,15 @@
                 </form>
             </div>
         {% endif %}
-    </section>
-    <section class="wrapper">
+    </div>
+    <div class="wrapper">
         <h3>Characters</h3>
         {% for character in user_object.character_set.all %}
             <p><a href="{{ character.get_absolute_url }}">{{ character.name }}</a> - <a href="{{character.get_absolute_url }}/delete/">[X]</a></p>
         {% endfor %}
         {% if user == user_object %}
-            <form method="post" action="/character/create/">
+            <a href="javascript:void(0)" onclick="$('#addCharacter').toggle()">+ Add Character</a>
+            <form method="post" action="/character/create/" id="addCharacter" style="display: none">
                 {% csrf_token %}
                 <table>
                     <tr>
@@ -65,12 +67,12 @@
                 </table>
             </form>
         {% endif %}
-    </section>
-    <section class="wrapper">
+    </div>
+    <div class="wrapper">
         <h3>Images</h3>
         {% for image in user_object.image_set.all %}
             <img src="{{ image.thumb }}" />
         {% endfor %}
-    </section>
-</article>
+    </div>
+</div>
 {% endblock %}

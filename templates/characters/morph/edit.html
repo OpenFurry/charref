@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Morph - {% endblock %}
+
+{% block header %}Edit Morph{% endblock %}
+
+{% block content %}
+<div class="wrapper">
+    <form method="post" action=".">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form.hidden_fields %}
+        {{ field }}
+        {% endfor %}
+        <table>
+            <tr>
+                <th><label for="id_gender">Gender</label></th>
+                <td>{{ form.gender }}</td>
+                <td>{{ form.gender.errors }}</td>
+            </tr>
+            <tr>
+                <th><label for="species_category">Species category</label></th>
+                <td>{{ species_category|safe }}</td>
+                <td>{{ form.species_category.errors }}</td>
+            </tr>
+            <tr>
+                <th><label for="id_species_text">Species text</label></th>
+                <td>{{ form.species_text }}</td>
+                <td>{{ form.species_category.errors }}</td>
+            </tr>
+            <tr>
+                <td colspan="3" style="text-align: center"><input type="submit" value="Save Morph" /></td>
+            </tr>
+        </table>
+    </form>
+</div>
+{% endblock %}

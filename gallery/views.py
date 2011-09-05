@@ -90,6 +90,7 @@ def delete_image(request, image_id):
         return HttpResponseRedirect('/')
     return render_to_response('gallery/image/delete.html', context_instance = RequestContext(request, {}))
 
+@login_required
 def attach_image(request, image_id):
     image = get_image_or_404(Image, image_id)
     if (request.user != image.owner):
@@ -100,7 +101,7 @@ def attach_image(request, image_id):
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     ctype = ContentType.objects.get_by_natural_key(request.GET['app_label'], request.GET['model'])
     form = ImageAttachmentForm(request.GET)
-    if (!form.is_valid()):
+    if (not form.is_valid()):
         request.user.message_set.create(message = '<div class="error">Something seems to have gone wrong with the attachment process.  Try again!</div>')
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     if (request.user != ctype.get_object_for_this_type(id = form.cleaned_data['object_id']).user):
@@ -113,6 +114,7 @@ def attach_image(request, image_id):
     request.user.message_set.create(message = '<div class="success">Image attached</div>')
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
+@login_required
 def detach_image(request, image_attachment_id):
     ia = get_object_or_404(ImageAttachment, image_attachment_id)
     if (request.user != image.owner):

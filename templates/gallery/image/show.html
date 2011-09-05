@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Image - {% endblock %}
+
+{% block header %}Image - posted by <a href="/~{{ image.user.username }}">~{{ image.user.username }}</a>{% endblock %}
+
+{% block content %}
+<div id="twoway">
+    <div class="wrapper">
+        <img src="/media/{{ image.image }}" style="width: 100%" />
+    </div>
+    <div class="wrapper">
+        <p><strong>Attribution:</strong> {{ image.attribution }}</p>
+        <p><strong>Rating:</strong> {{ image.get_rating_display }}</p>
+    </div>
+</div>
+{% endblock %}

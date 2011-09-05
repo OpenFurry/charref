@@ -17,11 +17,18 @@ class MorphForm(forms.ModelForm):
     class Meta:
         model = Morph
         exclude = ('user',)
+        widgets = {
+                'character': forms.HiddenInput()
+                }
 
 class DescriptionForm(forms.ModelForm):
     class Meta:
         model = Description
         exclude = ('user',)
+        widgets = {
+                'morph': forms.HiddenInput(),
+                'description': forms.Textarea(attrs = { 'rows': 10, 'cols': 60 })
+                }
 
 class LocationForm(forms.ModelForm):
     class Meta:

@@ -5,12 +5,12 @@
 {% block header %}Delete description: {{ description.name }} from {{ description.morph.gender }} {{ description.morph.species_text }} belonging to {{ description.morph.character.name }}{% endblock %}
 
 {% block content %}
-<article id="twoway">
-    <section class="wrapper">
+<div id="twoway">
+    <div class="wrapper">
         <h3>Confirm!</h3>
         <p>Please make sure you really want to delete this description!  This action cannot be undone!  Images will be detached, but remain uploaded - you can delete them separately.</p>
-    </section>
-    <section class="wrapper">
+    </div>
+    <div class="wrapper">
         <h3>I agree</h3>
         <p>I understand that this will delete my description.</p>
         <form method="post">
@@ -18,7 +18,7 @@
             <p><input type="checkbox" name="confirm" /> <label for="confirm"><strong>I agree</strong></label></p>
             <p><input type="submit" value="Delete description" /></p>
         </form>
-    </section>
-</article>
+    </div>
+</div>
 {% endblock %}
 
