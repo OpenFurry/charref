@@ -17,7 +17,7 @@ class Image(models.Model):
     rating = models.CharField(max_length = 1, choices = RATINGS)
     user = models.ForeignKey(User)
     stream_items = generic.GenericRelation(StreamItem)
-    attachments = generic.GenericRelation('ImageAttachment')
+    attachments = generic.GenericRelation('ImageAttachment', related_name = "generic_image")
 
     def get_absolute_url(self):
         return "/image/%d" % self.id

@@ -23,6 +23,9 @@ def front(request):
 def ng(request):
     return render_to_response('front-ng.html', context_instance = RequestContext(request, {}))
 
+def redirect_after_login(request):
+    return HttpResponseRedirect('/~%s' % request.user.username)
+
 def show_user(request, username):
     user = get_object_or_404(User, username = username)
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):

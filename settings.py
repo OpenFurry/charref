@@ -39,7 +39,7 @@ SITE_ID = 1
 
 STATIC_URL = "http://c.o-f.co"
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/accounts/profile/"
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.

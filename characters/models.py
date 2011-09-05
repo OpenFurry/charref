@@ -10,6 +10,9 @@ class Character(models.Model):
     user = models.ForeignKey(User)
     stream_items = generic.GenericRelation(StreamItem)
     images = generic.GenericRelation(ImageAttachment)
+    \
+    def __unicode__(self):
+        return self.name
 
     def get_absolute_url(self):
         return "/character/%d" % self.id
@@ -22,9 +25,12 @@ class Morph(models.Model):
     character = models.ForeignKey('Character')
     gender = models.CharField(max_length = 20)
     species_text = models.CharField(max_length = 60)
-    species_category = models.ForeignKey('SpeciesCategory')
+    species_category = models.ForeignKey('SpeciesCategory', null = True, blank = True)
     stream_items = generic.GenericRelation(StreamItem)
     images = generic.GenericRelation(ImageAttachment)
+    \
+    def __unicode__(self):
+        return "%s %s (~%s)" % (self.gender, self.species_text, self.user.username)
 
     def get_absolute_url(self):
         return "/morph/%d" % self.id
@@ -46,6 +52,9 @@ class Description(models.Model):
     rating = models.CharField(max_length = 1, choices = RATINGS)
     stream_items = generic.GenericRelation(StreamItem)
     images = generic.GenericRelation(ImageAttachment)
+    \
+    def __unicode__(self):
+        return "%s (~%s)" % (self.name, self.user.username)
 
     def get_absolute_url(self):
         return "/description/%d" % self.id
@@ -60,6 +69,9 @@ class Location(models.Model):
     stream_items = generic.GenericRelation(StreamItem)
     images = generic.GenericRelation(ImageAttachment)
 
+    def __unicode__(self):
+        return self.name
+
     def get_absolute_url(self):
         return "/location/%d" % self.id
 
@@ -72,4 +84,14 @@ class CharacterLocation(models.Model):
 
 class SpeciesCategory(models.Model):
     name = models.CharField(max_length = 50)
-    parent = models.ForeignKey('SpeciesCategory', null = True)
+    parent = models.ForeignKey('SpeciesCategory', blank = True, null = True)
+
+    def __unicode__(self):
+        if self.parent is None:
+            return self.name
+        else:
+            return "%s (%s)" % (self.name, self.parent.name)
+
+    class Meta:
+        ordering = ['id']
+        verbose_name_plural = "Species categories"
