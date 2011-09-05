@@ -5,7 +5,7 @@
 {% block header %}Log in{% endblock %}
 
 {% block content %}
-{% if form.errors %}<div class="failure">Username and password didn't match any of our users.</div>{% endif %}
+{% if form.errors %}<div class="error">Username and password didn't match any of our users.</div>{% endif %}
 <div id="twoway">
     <div class="wrapper">
         <p>Characters @ OpenFurry is a place to keep character descriptions and reference images - if you need to show an artist, simply link them to the character, a morph of that character, or a specific description pertaining to that morph.  You can associate images (following a by-me/for-me policy similar to FurAffinity's) with your characters, morphs, and descriptions.</p>

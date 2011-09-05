@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block head %}
+<link rev="canonical" type="text/html" href="http://c.o-f.co/~{{ user_object.username }}" />
+{% endblock %}
+
 {% block title %}{{ user_object.username }} (user) - {% endblock %}
 
 {% block header %}~{% if not user_object.is_active %}<s>{% endif %}{{ user_object.username }}{% if not user_object.is_active %}</s>{% endif %}{% endblock %}
@@ -44,8 +48,10 @@
                         </tr>
                     </table>
                 </form>
+                <a href="/accounts/password/change/">Change password</a>
             </div>
         {% endif %}
+        <div class="small">Permalink: <a href="http://c.o-f.co{{ request.get_full_path }}">http://c.o-f.co{{ request.get_full_path }}</a></div>
     </div>
     <div class="wrapper">
         <h3>Characters</h3>

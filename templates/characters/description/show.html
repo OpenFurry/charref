@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
+<link rev="canonical" type="text/html" href="http://c.o-f.co/d/{{ description.id }}" />
 <script type="text/javascript">
     $(function () {
         $('#imageBay').dialog({ 
@@ -36,6 +37,7 @@
                 {% endfor %}
             </ul>
         </div>
+        <div class="small">Permalink: <a href="http://c.o-f.co/d/{{ description.id }}">http://c.o-f.co/d/{{ description.id }}</a></div>
     </div>
     <div class="wrapper">
         <h3>Description</h3>

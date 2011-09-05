@@ -5,9 +5,11 @@ TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
+    ('Matthew Scott', 'makyo+characters@drab-makyo.com'),
 )
 
 MANAGERS = ADMINS
+DEFAULT_FROM_EMAIL = 'mjs+characters@mjs-svc.com'
 
 DATABASES = {
     'default': {
@@ -35,6 +37,7 @@ LANGUAGE_CODE = 'en-us'
 
 SITE_ID = 1
 
+STATIC_URL = "http://c.o-f.co"
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = "/"
 
@@ -68,6 +71,16 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+        "django.contrib.auth.context_processors.auth",
+        "django.core.context_processors.debug",
+        "django.core.context_processors.i18n",
+        "django.core.context_processors.media",
+        #"django.core.context_processors.static",
+        "django.core.context_processors.request",
+        "django.contrib.messages.context_processors.messages"
 )
 
 MIDDLEWARE_CLASSES = (

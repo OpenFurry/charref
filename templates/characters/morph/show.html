@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
+<link rev="canonical" type="text/html" href="http://c.o-f.co/m/{{ morph.id }}" />
 <script type="text/javascript">
     $(function () {
         $('#imageBay').dialog({ 
@@ -37,6 +38,7 @@
                 {% endfor %}
             </ul>
         </div>
+        <div class="small">Permalink: <a href="http://c.o-f.co/m/{{ morph.id }}">http://c.o-f.co/m/{{ morph.id }}</a></div>
     </div>
     <div class="wrapper">
         <h3>Descriptions</h3>

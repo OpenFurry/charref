@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block head %}
+<link rev="canonical" type="text/html" href="http://c.o-f.co/i/{{ image.id }}" />
+{% endblock %}
+
 {% block title %}Image - {% endblock %}
 
 {% block header %}Image - posted by <a href="/~{{ image.user.username }}">~{{ image.user.username }}</a>{% endblock %}
@@ -33,6 +37,7 @@
                 {% endfor %}
             </ul>
         </div>
+        <div class="small">Permalink: <a href="http://c.o-f.co/i/{{ image.id }}">http://c.o-f.co/i/{{ image.id }}</a></div>
     </div>
 </div>
 {% endblock %}
