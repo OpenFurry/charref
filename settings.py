@@ -35,6 +35,9 @@ LANGUAGE_CODE = 'en-us'
 
 SITE_ID = 1
 
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = "/"
+
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = True
@@ -90,11 +93,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
+    'django.contrib.admin',
+    'django.contrib.admindocs',
     'charref.characters',
     'charref.gallery',
     'charref.activitystream',
-    # Uncomment the next line to enable the admin:
-    'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
-    #'django.contrib.admindocs',
 )

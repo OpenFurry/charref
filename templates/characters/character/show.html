@@ -1,5 +1,18 @@
 {% extends "base.html" %}
 
+{% block head %}
+<script type="text/javascript">
+    $(function () {
+        $('#imageBay').dialog({ 
+            autoOpen: false,
+            width: 300,
+            height: 400,
+            modal: true
+        });
+    });
+</script>
+{% endblock %}
+
 {% block title %}{{ character.name }} (character) - {% endblock %}
 
 {% block header %}<a href="/~{{ character.user.username }}">~{{ character.user.username }}</a> / {{ character.name }}{% endblock %}
@@ -12,11 +25,12 @@
         <p><strong>Character owner:</strong> <a href="/~{{ character.user.username }}">{{ character.user.username }}</a></p>
         {% if character.user == user %}
         <p><a href="{{ character.get_absolute_url }}/edit">Edit this character</a></p>
+        <p><a href="javascript:void(0)" onclick="$('#imageBay').dialog('open');">Attach image</a></p>
         {% endif %}
-        <div>
+        <div class="astream">
             <ul>
                 {% for si in character.stream_items.all %}
-                    <li class="{% cycle "odd" "even" %}"><a href="/~{{ si.user.username }}">~{{ si.user.username }}</a> {{ si.get_action_type_display }} {{ character.name }} (character)</li>
+                <li class="{% cycle "odd" "even" %}" title="{{ si.action_time|date:"DATETIME_FORMAT" }}"><a href="/~{{ si.user.username }}">~{{ si.user.username }}</a> {{ si.get_action_type_display }} {{ character.name }} (character)</li>
                 {% endfor %}
             </ul>
         </div>
@@ -55,8 +69,30 @@
     <div class="wrapper">
         <h3>Images</h3>
         {% for image in character.images.all %}
-            {{ image }}
+        <div>
+            <a href="{{ image.image.get_absolute_url }}"><img src="/media/{{ image.image.thumbnail }}" alt="{{ image.image.attribution }}" /></a><br />
+            {{ image.caption }}
+            {% if character.user == user %}
+            <a href="/image/{{ image.id }}/detach/">[X]</a>
+            {% endif %}
+        </div>
         {% endfor %}
     </div>
 </div>
+{% if character.user == user %}
+<div id="imageBay" title="Attach an image">
+    {% for image in user.image_set.all %}
+    <form method="post" action="/image/{{ image.id }}/attach/">
+        {% csrf_token %}
+        <input type="hidden" name="content_type" value="{{ character.get_content_type.id }}" />
+        <input type="hidden" name="object_id" value=" {{character.id }}" />
+        <p><input type="image" src="/media/{{ image.thumbnail }}" alt="Attach image" /></p>
+        <p><strong>Caption:</strong> <input type="text" name="caption" /></p>
+    </form>
+    {% if not forloop.last %}
+    <hr />
+    {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
 {% endblock %}

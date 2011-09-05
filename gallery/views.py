@@ -10,7 +10,7 @@ from charref.gallery.forms import *
 from charref.activitystream.models import *
 
 def show_image(request, image_id):
-    image = get_object_or_404(Image, image_id)
+    image = get_object_or_404(Image, id = image_id)
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", (image,)), mimetype = "application/json")
     else:
@@ -33,13 +33,13 @@ def list_images_attached_to_object(request, app_name, model, object_id):
 
 @login_required
 def edit_image(request, image_id):
-    image = get_object_or_404(Image, image_id)
+    image = get_object_or_404(Image, id = image_id)
     form = ImageForm(instance = image)
-    if (request.user != image.owner):
+    if (request.user != image.user):
         request.user.message_set.create(message = '<div class="error">You may only edit images that belong to you!</div>')
         return render_to_response('permission_denied.html', context_instnace = RequestContext(request, {}))
     if (request.method == "POST"):
-        form = ImageForm(request.POST, instance = image)
+        form = ImageForm(request.POST, request.FILES, instance = image)
         if (form.is_valid()):
             form.save()
             si = StreamItem(
@@ -56,10 +56,10 @@ def edit_image(request, image_id):
 def create_image(request):
     form = ImageForm()
     if (request.method == "POST"):
-        form = ImageForm(request.POST)
+        form = ImageForm(request.POST, request.FILES)
         if (form.is_valid()):
             image = form.save(commit = False)
-            image.owner = request.user
+            image.user = request.user
             image.save()
             form.save_m2m()
             si = StreamItem(
@@ -74,11 +74,13 @@ def create_image(request):
     
 @login_required
 def delete_image(request, image_id):
-    image = get_object_or_404(Image, image_id)
-    if (request.user != image.owner):
+    image = get_object_or_404(Image, id = image_id)
+    if (request.user != image.user):
         request.user.message_set.create(message = '<div class="error">You may only delete images that belong to you!</div>')
         return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
-    if (request.method == "POST" and request.POST.get('confirm', None) == 'yes'):
+    if (request.method == "POST" and request.POST.get('confirm', None) is not None):
+        for ia in image.attachments.all():
+            ia.delete()
         image.delete()
         si = StreamItem(
                 action_type = 'D',
@@ -86,38 +88,34 @@ def delete_image(request, image_id):
                 content_type = ContentType.objects.get_for_model(Image),
                 object_id = image_id)
         si.save()
-        request.user.message_set.create('<div class="success">Image deleted</div>')
-        return HttpResponseRedirect('/')
-    return render_to_response('gallery/image/delete.html', context_instance = RequestContext(request, {}))
+        request.user.message_set.create(message = '<div class="success">Image deleted</div>')
+        return HttpResponseRedirect('/~%s' % request.user.username)
+    return render_to_response('gallery/image/delete.html', context_instance = RequestContext(request, {'image': image}))
 
 @login_required
 def attach_image(request, image_id):
-    image = get_image_or_404(Image, image_id)
-    if (request.user != image.owner):
+    image = get_object_or_404(Image, id = image_id)
+    if (request.user != image.user):
         request.user.message_set.create(message = '<div class="error">You may only attach your images to artifacts!</div>')
         return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
-    if (request.GET.get('app_label', None) is None or request.GET.get('model', None) is None):
-        request.user.message_set.create(message = '<div class="error">There seems to have been a problem - app_label or model was None!  Try again.</div>')
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
-    ctype = ContentType.objects.get_by_natural_key(request.GET['app_label'], request.GET['model'])
-    form = ImageAttachmentForm(request.GET)
+    form = ImageAttachmentForm(request.POST)
     if (not form.is_valid()):
-        request.user.message_set.create(message = '<div class="error">Something seems to have gone wrong with the attachment process.  Try again!</div>')
+        request.user.message_set.create(message = '<div class="error">Something seems to have gone wrong with the attachment process.  Try again! %s</div>' % form.errors)
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
-    if (request.user != ctype.get_object_for_this_type(id = form.cleaned_data['object_id']).user):
-        request.user.message_set.create(messages = '<div class="error">You may only attach images to your own artifacts!</div>')
-        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
     ia = form.save(commit = False)
-    ia.content_type = ctype
+    ia.image = image
     ia.save()
     form.save_m2m()
+    if (request.user != ia.content_object.user):
+        request.user.message_set.create(message = '<div class="error">You may only attach your images to your own artifacts!</div>')
+        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
     request.user.message_set.create(message = '<div class="success">Image attached</div>')
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 @login_required
 def detach_image(request, image_attachment_id):
-    ia = get_object_or_404(ImageAttachment, image_attachment_id)
-    if (request.user != image.owner):
+    ia = get_object_or_404(ImageAttachment, id = image_attachment_id)
+    if (request.user != ia.image.user):
         request.user.message_set.create(message = '<div class="error">You may only detach your images!</div>')
         return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
     if (request.user != ia.content_object.user):

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 from charref.gallery.models import ImageAttachment
 from charref.activitystream.models import *
 
@@ -13,6 +14,9 @@ class Character(models.Model):
     def get_absolute_url(self):
         return "/character/%d" % self.id
 
+    def get_content_type(self):
+        return ContentType.objects.get_for_model(self)
+
 class Morph(models.Model):
     user = models.ForeignKey(User)
     character = models.ForeignKey('Character')
@@ -24,6 +28,9 @@ class Morph(models.Model):
 
     def get_absolute_url(self):
         return "/morph/%d" % self.id
+
+    def get_content_type(self):
+        return ContentType.objects.get_for_model(self)
     
 class Description(models.Model):
     RATINGS  = (
@@ -43,6 +50,9 @@ class Description(models.Model):
     def get_absolute_url(self):
         return "/description/%d" % self.id
 
+    def get_content_type(self):
+        return ContentType.objects.get_for_model(self)
+
 class Location(models.Model):
     name = models.CharField(max_length = 120)
     description = models.TextField()
@@ -52,6 +62,9 @@ class Location(models.Model):
 
     def get_absolute_url(self):
         return "/location/%d" % self.id
+
+    def get_content_type(self):
+        return ContentType.objects.get_for_model(self)
 
 class CharacterLocation(models.Model):
     character = models.ForeignKey(Character)

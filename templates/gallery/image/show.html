@@ -7,11 +7,32 @@
 {% block content %}
 <div id="twoway">
     <div class="wrapper">
-        <img src="/media/{{ image.image }}" style="width: 100%" />
+        <img src="/media/{{ image.image }}" style="max-width: 100%" />
     </div>
     <div class="wrapper">
         <p><strong>Attribution:</strong> {{ image.attribution }}</p>
         <p><strong>Rating:</strong> {{ image.get_rating_display }}</p>
+        <p><strong>Thumbnail:</strong> <img src="/media/{{ image.thumbnail }}" style="vertical-align: top" />
+        <p><strong>Attachments:</strong><p>
+        <ul>
+            {% for attachment in image.attachments.all %}
+            <li>{{ attachment }}</li>
+            {% empty %}
+            <li><em>No attachments</em></li>
+            {% endfor %}
+        </ul>
+        {% if image.user == user %}
+        <p><a href="{{ image.get_absolute_url }}/edit">Edit this image</a></p>
+        <p><a href="{{ image.get_absolute_url }}/delete">Delete this image</a></p>
+        {% endif %}
+        <hr />
+        <div class="astream">
+            <ul>
+                {% for si in image.stream_items.all %}
+                <li class="{% cycle "odd" "even" %}" title="{{ si.action_time|date:"DATETIME_FORMAT" }}"><a href="/~{{ si.user.username }}">~{{ si.user.username }}</a> {{ si.get_action_type_display }} image {{ image.id }}</li>
+                {% endfor %}
+            </ul>
+        </div>
     </div>
 </div>
 {% endblock %}

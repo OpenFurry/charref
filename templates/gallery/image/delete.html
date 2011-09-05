@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Delete: image {{ image.id }} - {% endblock %}
+
+{% block header %}Delete image: {{ image.id }}{% endblock %}
+
+{% block content %}
+<div id="twoway">
+    <div class="wrapper">
+        <h3>Confirm!</h3>
+        <p>Please make sure you really want to delete this image!  This action cannot be undone, and will detach this image from all artifacts!</p>
+        <p><img src="/media/{{ image.image }}" style="max-width: 100%" /></p>
+    </div>
+    <div class="wrapper">
+        <h3>I agree</h3>
+        <p>I understand that this will delete my image and detach it from all artifacts.</p>
+        <form method="post">
+            {% csrf_token %}
+            <p><input type="checkbox" name="confirm" /> <label for="confirm"><strong>I agree</strong></label></p>
+            <p><input type="submit" value="Delete image" /></p>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="wrapper">
-    <form method="post" action=".">
+    <form enctype="multipart/form-data" method="post" action=".">
         {% csrf_token %}
         {{ form.non_field_errors }}
         {% for field in form.hidden_fields %}
@@ -20,6 +20,9 @@
                 <td>{{ field.errors }}</td>
             </tr>
             {% endfor %}
+            <tr>
+                <td colspan="3"><input type="submit" value="Save image" /></td>
+            </tr>
         </table>
     </div>
 </div>

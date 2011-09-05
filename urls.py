@@ -10,7 +10,7 @@ urlpatterns = patterns('charref.characters.views',
     (r'^~(?P<username>[a-zA-Z0-9\-_]+)/$', 'show_user'),
     (r'^~(?P<username>[a-zA-Z0-9\-_]+)/edit/$', 'edit_user'),
     (r'^register/$', 'register'),
-    (r'^users/$', 'list_users'),
+    #(r'^users/$', 'list_users'),
 
     (r'^characters/$', 'list_characters'),
     (r'^~(?P<username>[a-zA-Z0-9\-_]+)/characters/$', 'list_characters_for_user'),
@@ -45,7 +45,7 @@ urlpatterns += patterns('charref.gallery.views',
     (r'^image/create/$', 'create_image'),
     (r'^image/(?P<image_id>\d+)/$', 'show_image'),
     (r'^image/(?P<image_id>\d+)/edit/$', 'edit_image'),
-    (r'^image/(?P<image_id>\d+)/delete/$', 'edit_image'),
+    (r'^image/(?P<image_id>\d+)/delete/$', 'delete_image'),
     (r'^image/(?P<image_id>\d+)/attach/$', 'attach_image'),
     (r'^image/(?P<image_attachment_id>\d+)/detach/$', 'detach_image'),
     (r'^~(?P<username>[a-zA-Z0-9\-_]+)/images/$', 'list_images_for_user'),
@@ -53,7 +53,16 @@ urlpatterns += patterns('charref.gallery.views',
 )
 
 urlpatterns += patterns('',
-    (r'^_security/', include('charref.permissions.urls')),
-    (r'^admin/', include(admin.site.urls))
+    (r'^login/$', 'django.contrib.auth.views.login'),
+    (r'^logout/$', 'django.contrib.auth.views.logout_then_login'),
+    (r'^accounts/create/$', 'charref.characters.views.register'),
+    (r'^accounts/password/change/$', 'django.contrib.auth.views.password_change'),
+    (r'^accounts/password/change/done/$', 'django.contrib.auth.views.password_change_done'),
+    (r'^accounts/password/reset/$', 'django.contrib.auth.views.password_reset'),
+    (r'^accounts/password/reset/confirm/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$', 'django.contrib.auth.views.password_reset_confirm'),
+    (r'^accounts/password/reset/complete', 'django.contrib.auth.views.password_reset_complete'),
+    (r'^accounts/password/reset/done/$', 'django.contrib.auth.views.password_reset_done'),
+    #(r'^_security/', include('charref.permissions.urls')),
+    (r'^admin/', include(admin.site.urls)),
+    (r'^admin/docs/', include('django.contrib.admindocs.urls'))
 )
-

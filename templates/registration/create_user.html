@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Register - {% endblock %}
+
+{% block header %}Register{% endblock %}
+
+{% block content %}
+<div id="twoway">
+    <div class="wrapper">
+        <p>Characters @ OpenFurry is a place to keep character descriptions and reference images - if you need to show an artist, simply link them to the character, a morph of that character, or a specific description pertaining to that morph.  You can associate images (following a by-me/for-me policy similar to FurAffinity's) with your characters, morphs, and descriptions.</p>
+        <p>Already a user? <a href="/login/">Log in</a></p>
+    </div>
+    <div class="wrapper">
+        <form method="post" action="/accounts/create/">
+            <table>
+                <tr>
+                    <th><abbr title="Letters, numbers, and underscore only!"><label for="username">Username:</label></abbr></th>
+                    <td><input type="text" name="username" /></td>
+                </tr>
+                <tr>
+                    <th><label for="password">Password:</label></th>
+                    <td><input type="password" name="password" /></td>
+                </tr>
+                <tr>
+                    <th><label for="email">Email:</label></th>
+                    <td><input type="text" name="email" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><input type="submit" value="Register" /></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+{%endblock %}

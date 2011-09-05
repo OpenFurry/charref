@@ -9,3 +9,4 @@ class ImageForm(forms.ModelForm):
 class ImageAttachmentForm(forms.ModelForm):
     class Meta:
         model = ImageAttachment
+        exclude = ('image',)

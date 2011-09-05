@@ -64,7 +64,7 @@ def register(request):
             return HttpResponseRedirect("/~%s" % request.user.username)
         else:
             request.user.message_set.create(message = '<div class="failure">Oops!  All fields required!</div>')
-    return render_to_response("characters/user/create.html", context_instance = RequestContext(request, {}))
+    return render_to_response("registration/create_user.html", context_instance = RequestContext(request, {}))
 
 ##
 

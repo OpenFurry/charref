@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+from charref.activitystream.models import StreamItem
 
 class Image(models.Model):
     RATINGS  = (
@@ -15,9 +16,11 @@ class Image(models.Model):
     attribution = models.CharField(max_length = 200)
     rating = models.CharField(max_length = 1, choices = RATINGS)
     user = models.ForeignKey(User)
+    stream_items = generic.GenericRelation(StreamItem)
+    attachments = generic.GenericRelation('ImageAttachment')
 
     def get_absolute_url(self):
-        return "/image/%d/" % self.id
+        return "/image/%d" % self.id
 
     def save(self):
         from PIL import Image as img
@@ -36,7 +39,7 @@ class Image(models.Model):
             fp = StringIO()
             t.save(fp, "JPEG", quality = 95)
 
-            self.thumb.save(name = self.image.name, content = ContentFile(fp.getValue()), save = False)
+            self.thumbnail.save(name = self.image.name, content = ContentFile(fp.getvalue()), save = False)
         except IOError:
             pass
 

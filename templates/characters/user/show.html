@@ -71,7 +71,7 @@
     <div class="wrapper">
         <h3>Images</h3>
         {% for image in user_object.image_set.all %}
-            <img src="{{ image.thumb }}" />
+        <a href="{{ image.get_absolute_url }}"><img src="/media/{{ image.thumbnail }}" /></a>
         {% endfor %}
     </div>
 </div>
