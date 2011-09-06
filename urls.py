@@ -10,7 +10,7 @@ urlpatterns = patterns('charref.characters.views',
     (r'^~(?P<username>[a-zA-Z0-9\-_]+)/$', 'show_user'),
     (r'^~(?P<username>[a-zA-Z0-9\-_]+)/edit/$', 'edit_user'),
     (r'^register/$', 'register'),
-    #(r'^users/$', 'list_users'),
+    (r'^users/$', 'list_users'),
 
     (r'^characters/$', 'list_characters'),
     (r'^~(?P<username>[a-zA-Z0-9\-_]+)/characters/$', 'list_characters_for_user'),

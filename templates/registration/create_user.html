@@ -12,6 +12,7 @@
     </div>
     <div class="wrapper">
         <form method="post" action="/accounts/create/">
+            {% csrf_token %}
             <table>
                 <tr>
                     <th><abbr title="Letters, numbers, and underscore only!"><label for="username">Username:</label></abbr></th>

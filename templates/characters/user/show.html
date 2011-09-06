@@ -20,7 +20,7 @@
         <p><strong>Characters:</strong> {{ user_object.character_set.count }}
         <p><strong>Morphs:</strong> {{ user_object.morph_set.count }}
         <p><strong>Descriptions:</strong> {{ user_object.description_set.count }}
-        <p><strong>Locations (as owner):</strong> {{ user_object.description_set.count }}
+        <p><strong>Locations (as owner):</strong> {{ user_object.location_set.count }}
         {% if user == user_object %}
             <hr />
             <a href="javascript:void(0)" onclick="$('#updateform').toggle()">Edit info</a>

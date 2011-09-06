@@ -1,5 +1,16 @@
 {% extends "base.html" %}
 
+{% block head %}
+<script type="text/javascript">
+    var species;
+    $(function() {
+        $.get('/_species/', {}, function(data, status, jqXHR) {
+            species = data;
+        }, "json");
+    });
+</script>
+{% endblock %}
+
 {% block header %}Welcome!{% endblock %}
 
 {% block content %}
@@ -12,7 +23,7 @@
     <div class="wrapper">
         <h3>Stats</h3>
         <div class="wrapper">
-            <p><strong>Users:</strong> {{ counts.users }}</p>
+            <p><strong>Users:</strong> {{ counts.users }} (<a href="/users">list</a>)</p>
             <p><strong>Characters:</strong> {{ counts.characters }}</p>
             <p><strong>Morphs:</strong> {{ counts.morphs }}</p>
             <p><strong>Descriptions:</strong> {{ counts.descriptions }}</p>

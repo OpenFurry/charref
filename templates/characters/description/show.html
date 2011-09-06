@@ -10,6 +10,7 @@
             height: 400,
             modal: true
         });
+        $('#descriptiontext').click(function(event) { $(this).toggleClass('showdescription'); });
     });
 </script>
 {% endblock %}
@@ -24,7 +25,7 @@
         <h3>Stats</h3>
         <p><strong>Description name:</strong> {{ description.name }}</p>
         <p><strong>Description rating:</strong> {{ description.get_rating_display }}</p>
-        <p><strong>Description owner:</strong> <a href="/~{{ morph.user.username }}">{{ description.user.username }}</a></p>
+        <p><strong>Description owner:</strong> <a href="/~{{ description.user.username }}">{{ description.user.username }}</a></p>
         {% if description.user == user %}
         <p><a href="{{ description.get_absolute_url }}/edit">Edit this description</a></p>
         <p><a href="javascript:void(0)" onclick="$('#imageBay').dialog('open');">Attach image</a></p>
@@ -41,7 +42,10 @@
     </div>
     <div class="wrapper">
         <h3>Description</h3>
-        <div>
+        {% if description.rating == "R" or description.rating == "M" %}
+        <p class="small">Click to show in full</p>
+        {% endif %}
+        <div id="descriptiontext" class="description{{description.rating}}">
             {{ description.description|linebreaks }}
         </div>
     </div>

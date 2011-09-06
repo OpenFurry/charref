@@ -28,6 +28,25 @@ def ng(request):
 def redirect_after_login(request):
     return HttpResponseRedirect('/~%s' % request.user.username)
 
+def list_users(request):
+    query = User.objects.all()
+    paginator = Paginator(query, 10)
+
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        users = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        logs = paginator.page(paginator.num_pages)
+
+    if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
+        return HttpResponse(serializers.serialize("json", users), mimetype = "application/json")
+    else:
+        return render_to_response('characters/user/list.html', context_instance = RequestContext(request, {'users': users}))
+
 def show_user(request, username):
     user = get_object_or_404(User, username = username)
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
@@ -60,13 +79,14 @@ def register(request):
             user = User.objects.create_user(request.POST['username'], request.POST['email'], None)
             user.set_password(request.POST['password'])
             user.save()
+            user = User.objects.get(username = request.POST['username'])
             si = StreamItem(
                     action_type = 'C',
-                    user = request.user,
+                    user = user,
                     content_type = ContentType.objects.get_for_model(User),
                     object_id = user.id)
             si.save()
-            return HttpResponseRedirect("/~%s" % request.user.username)
+            return HttpResponseRedirect("/~%s" % user.username)
         else:
             request.user.message_set.create(message = '<div class="failure">Oops!  All fields required!</div>')
     return render_to_response("registration/create_user.html", context_instance = RequestContext(request, {}))
@@ -480,7 +500,17 @@ def detach_character_from_location(request, characterlocation_id):
 ##
 
 def ajax_list_species(request):
-    pass
+    import json
+    species = {}
+    for morph in Morph.objects.all():
+        if (morph.species_category.parent.name not in species):
+            species.update({morph.species_category.parent.name: { 'category': morph.species_category.name, 'count': 1 }})
+        else:
+            if (morph.species_category.name not in species[morph.species_category.parent.name]):
+                species[morph.species_category.parent.name].update({morph.species_category.name: { 'category': morph.species_category.name, 'count': 1 }})
+            else:
+                species[morph.species_category.parent.name].update({morph.species_category.name: { 'category': morph.species_category.name, 'count': species[morph.species_category.parent.name][morph.species_category.name]['count'] + 1 }})
+    return HttpResponse(json.dumps(species), mimetype = "application/json")
 
 ##
 
