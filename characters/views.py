@@ -5,6 +5,7 @@ from django.core import serializers
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.core.paginator import Paginator
 from charref.characters.models import *
 from charref.gallery.models import Image
 from charref.characters.forms import *
@@ -13,6 +14,7 @@ from charref.activitystream.models import *
 def front(request):
     counts = {
             'users': User.objects.count(),
+            'locations': Location.objects.count(),
             'characters': Character.objects.count(),
             'morphs': Morph.objects.count(),
             'descriptions': Description.objects.count(),
@@ -103,7 +105,7 @@ def show_character(request, character_id):
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", (character,)), mimetype = "application/json")
     else:
-        return render_to_response('characters/character/show.html', context_instance = RequestContext(request, {'character': character}))
+        return render_to_response('characters/character/show.html', context_instance = RequestContext(request, {'character': character, 'species_select': _species_select_dropdown()}))
 
 @login_required
 def edit_character(request, character_id):
@@ -147,7 +149,7 @@ def delete_character(request, character_id):
         return render_to_response('characters/character/delete.html', context_instance = RequestContext(request, {'character': character}))
 
 @login_required
-def create_character(request, character_id):
+def create_character(request):
     if (request.method == "GET"):
         return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {}))
     if (request.POST.get('name', None) is not None):
@@ -431,6 +433,50 @@ def create_location(request):
             return HttpResponseRedirect(location.get_absolute_url())
     return render_to_response("characters/location/edit.html", context_instance = RequestContext(request, {'form': form}))
 
+@login_required
+def attach_character_to_location(request, location_id):
+    location = get_object_or_404(Location, id = location_id)
+    if (request.GET.get('character_id', None) is None):
+        request.user.message_set.create(message = '<div class="error">Must attach a character to a location!</div>')
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    character = get_object_or_404(Character, id = request.GET['character_id'])
+    if (request.user != character.user):
+        request.user.message_set.create(message = '<div class="error">You may only attach your own characters!</div>')
+        #TODO flag user
+        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
+    if (CharacterLocation.objects.filter(character = character, location = location).count() > 0):
+        request.user.message_set.create(message = '<div class="warning">That character is already attached to this location!</div>')
+        return HttpResponseRedirect(location.get_absolute_url())
+    cl = CharacterLocation(
+            character = character,
+            location = location,
+            name_at_location = request.GET.get('as', ''))
+    cl.save()
+    si = StreamItem(
+            action_type = 'LA',
+            user = request.user,
+            content_type = ContentType.objects.get_for_model(Location),
+            object_id = location.id)
+    si.save()
+    return HttpResponseRedirect(location.get_absolute_url())
+
+@login_required
+def detach_character_from_location(request, characterlocation_id):
+    cl = get_object_or_404(CharacterLocation, id = characterlocation_id)
+    if (request.user != cl.character.user):
+        request.user.message_set.create(message = '<div class="error">You may only detach your own characters!</div>')
+        #TODO flag user
+        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
+    location = cl.location
+    cl.delete()
+    si = StreamItem(
+            action_type = 'LD',
+            user = request.user,
+            content_type = ContentType.objects.get_for_model(Location),
+            object_id = location.id)
+    si.save()
+    return HttpResponseRedirect(location.get_absolute_url())
+
 ##
 
 def ajax_list_species(request):
@@ -439,7 +485,7 @@ def ajax_list_species(request):
 ##
 
 def _species_select_dropdown(selected = None):
-    to_return = '<select name="species_category">'
+    to_return = '<select name="species_category"><option>-- Select --</option>'
     species = SpeciesCategory.objects.filter(parent__isnull = True)
     for s in species:
         to_return += '<optgroup label="%s">' % s.name

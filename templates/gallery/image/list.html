@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Images (~{{ user_object }}){% endblock %}
+
+{% block header %}<a href="/~{{ user_object.username }}">~{{ user_object.username }}</a> / Images{% endblock %}
+
+{% block content %}
+<div id="twoway">
+    <h3>Images</h3>
+    {% if user == user_object %}
+    <p><a href="/image/create/">+ Add an image</a></p>
+    {% endif %}
+    {% for image in user_object.image_set.all %}
+    {% cycle "<div class=\"wrapper\">" "" %}
+    <div class="wrapper" style="height: 200px;{% if forloop.counter0|divisibleby:"4" %} clear: left;{% endif %}">
+        <a href="{{ image.get_absolute_url }}"><img class="thumb{{ image.rating }}" src="/media/{{ image.thumbnail }}" /></a><br />
+        <em>Attribution: {{ image.attribution }}</em>
+    </div>
+    {% cycle "" "</div>" %}
+    {% if forloop.last %}
+    {% if not forloop.counter|divisibleby:"2" %}
+    </div>
+    {% endif %}
+    {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Locations - {% endblock %}
+
+{% block header %}Locations{% endblock %}
+
+{% block content %}
+<div id="twoway">
+    <div class="wrapper">
+        <p>Locations are places where your characters might be found.  They can be instant messaging services, chatrooms, MUCKs, forums, etc.  You can attach a character of yours to a location, and give it a name at that location if it differs from the character's name.  This will let people find you around the internet!</p>
+        <p>Don't see a location you want?  Let me know, shoot me an email at &lt; makyo @ drab-makyo . com &gt; without spaces!</p>
+    </div>
+    <div class="wrapper plist">
+        <ul>
+            {% for location in locations.object_list %}
+            <li class="{% cycle "odd" "even" %}"><a href="{{ location.get_absolute_url }}">{{ location.name }}</a> - {{ location.characterlocation_set.count }} characters</li>
+            {% endfor %}
+        </ul>
+        <hr />
+        <div class="pagination">
+            <strong>Page:</strong><br />
+            {% ifnotequal locations.number 1 %}{% ifnotequal locations.number 2 %}<a href="?page=1">1</a> ... {% endifnotequal %}{% endifnotequal %}
+            {% if locations.has_previous %}
+            <a href="?page={{ locations.previous_page_number }}">{{ locations.previous_page_number }}</a>
+            {% endif %}
+
+            <strong>{{ locations.number }}</strong>
+
+            {% if locations.has_next %}
+            <a href="?page={{ locations.next_page_number }}">{{ locations.next_page_number }}</a>
+            {% endif %}
+            {% ifnotequal locations.paginator.num_pages locations.number %}{% ifnotequal locations.number locations.paginator.num_pages|add:"-1" %} ... <a href="?page={{ locations.paginator.num_pages }}">{{ locations.paginator.num_pages }}</a>{% endifnotequal %}{% endifnotequal %}
+        </div>
+    </div>
+</div>
+{% endblock %}

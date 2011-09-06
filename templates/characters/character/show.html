@@ -10,6 +10,15 @@
             height: 400,
             modal: true
         });
+        $('#gender-preselect').change(function(event) {
+            var preselect = this;
+            $('#gender').val($(preselect).val());
+            if ($(preselect).val() == "Other") {
+                $('#gender').show();
+            } else {
+                $('#gender').hide();
+            }
+        });
     });
 </script>
 {% endblock %}
@@ -40,7 +49,10 @@
     <div class="wrapper">
         <h3>Morphs</h3>
         {% for morph in character.morph_set.all %}
-            <p><a href="{{ morph.get_absolute_url }}">{{ morph.gender }} {{ morph.species_text }}</a> - <a href="{{ morph.get_absolute_url }}/delete">[X]</a></p>
+        <p><a href="{{ morph.get_absolute_url }}">{{ morph.gender }} {{ morph.species_text }}</a>
+        {% if character.user == user %}
+        - <a href="{{ morph.get_absolute_url }}/delete">[X]</a></p>
+        {% endif %}
         {% endfor %}
         {% if user == character.user %}
             <hr />
@@ -51,11 +63,20 @@
                 <table>
                     <tr>
                         <th><label for="gender">Gender:</label></th>
-                        <td><input type="text" name="gender" /></td>
+                        <td>
+                            <select id="gender-preselect">
+                                <option value="">-- Select --</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Herm">Herm</option>
+                                <option value="Other">Other...</option>
+                            </select>
+                            <input type="text" id="gender" name="gender" style="display: none" />
+                        </td>
                     </tr>
                     <tr>
                         <th><label for="species_category">Species category</label></th>
-                        <td><input type="hidden" name="species_category" value="1" />Not Yet Implemented</td>
+                        <td>{{ species_select|safe }}</td>
                     </tr>
                     <tr>
                         <th><label for="species_text">Species:</label></th>
@@ -68,16 +89,21 @@
             </form>
         {% endif %}
     </div>
-    <div class="wrapper">
+    <div style="clear: left">
         <h3>Images</h3>
         {% for image in character.images.all %}
-        <div>
-            <a href="{{ image.image.get_absolute_url }}"><img src="/media/{{ image.image.thumbnail }}" alt="{{ image.image.attribution }}" /></a><br />
+        {% cycle "<div class=\"wrapper\">" "" %}
+        <div class="wrapper" style="height: 200px;{% if forloop.counter0|divisibleby:"4" %} clear: left;{% endif %}">
+            <a href="{{ image.image.get_absolute_url }}"><img class="thumb{{ image.image.rating }}" src="/media/{{ image.image.thumbnail }}" alt="{{ image.image.attribution }}" /></a><br />
             {{ image.caption }}
             {% if character.user == user %}
             <a href="/image/{{ image.id }}/detach/">[X]</a>
             {% endif %}
         </div>
+        {% cycle "" "</div>" %}
+        {% if forloop.last and not forloop.counter|divisibleby:"2" %}
+        </div>
+        {% endif %}
         {% endfor %}
     </div>
 </div>

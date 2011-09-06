@@ -17,11 +17,11 @@ def show_image(request, image_id):
         return render_to_response('gallery/image/show.html', context_instance = RequestContext(request, {'image': image}))
 
 def list_images_for_user(request, username):
-    images = Image.objects.filter(user__username__exact = username)
+    user = get_object_or_404(User, username = username)
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", images), mimetype = "application/json")
     else:
-        return render_to_response('gallery/image/list.html', context_instance = RequestContext(Request, {'images': image}))
+        return render_to_response('gallery/image/list.html', context_instance = RequestContext(request, {'user_object': user}))
 
 def list_images_attached_to_object(request, app_name, model, object_id):
     ias = ContentType.objects.get_by_natural_key(app_name, model).model_class().get(id = object_id).images.all()
@@ -48,7 +48,7 @@ def edit_image(request, image_id):
                     content_type = ContentType.objects.get_for_model(Image),
                     object_id = image_id)
             si.save()
-            request.user.message_set.create(message = '<div class="success">Image update</div>')
+            request.user.message_set.create(message = '<div class="success">Image updated</div>')
             return HttpResponseRedirect(image.get_absolute_url())
     return render_to_response('gallery/image/edit.html', context_instance = RequestContext(request, {'form': form}))
 
@@ -68,7 +68,7 @@ def create_image(request):
                     content_type = ContentType.objects.get_for_model(Image),
                     object_id = image.id)
             si.save()
-            request.user.message_set.create(message = '<div class="success">Image created</div>')
+            request.user.message_set.create(message = '<div class="success">Image created - <a href="/image/create/">Add another!</a></div>')
             return HttpResponseRedirect(image.get_absolute_url())
     return render_to_response('gallery/image/edit.html', context_instance = RequestContext(request, {'form': form}))
     

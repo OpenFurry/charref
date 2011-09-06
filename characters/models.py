@@ -10,7 +10,7 @@ class Character(models.Model):
     user = models.ForeignKey(User)
     stream_items = generic.GenericRelation(StreamItem)
     images = generic.GenericRelation(ImageAttachment)
-    \
+    
     def __unicode__(self):
         return self.name
 
@@ -28,7 +28,7 @@ class Morph(models.Model):
     species_category = models.ForeignKey('SpeciesCategory', null = True, blank = True)
     stream_items = generic.GenericRelation(StreamItem)
     images = generic.GenericRelation(ImageAttachment)
-    \
+
     def __unicode__(self):
         return "%s %s (~%s)" % (self.gender, self.species_text, self.user.username)
 
@@ -52,7 +52,7 @@ class Description(models.Model):
     rating = models.CharField(max_length = 1, choices = RATINGS)
     stream_items = generic.GenericRelation(StreamItem)
     images = generic.GenericRelation(ImageAttachment)
-    \
+
     def __unicode__(self):
         return "%s (~%s)" % (self.name, self.user.username)
 
@@ -81,6 +81,7 @@ class Location(models.Model):
 class CharacterLocation(models.Model):
     character = models.ForeignKey(Character)
     location = models.ForeignKey(Location)
+    name_at_location = models.CharField(max_length = 50, blank = True)
 
 class SpeciesCategory(models.Model):
     name = models.CharField(max_length = 50)

@@ -14,7 +14,9 @@ class StreamItem(models.Model):
             ('MA', 'added a morph to'),
             ('MD', 'removed a morph from'),
             ('DA', 'added a description to'),
-            ('DD', 'removed a description from')
+            ('DD', 'removed a description from'),
+            ('LA', 'attached a character to'),
+            ('LD', 'detached a character from')
             )
 
     action_time = models.DateTimeField(auto_now_add = True)

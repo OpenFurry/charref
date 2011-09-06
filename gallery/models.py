@@ -40,6 +40,15 @@ class Image(models.Model):
             t.save(fp, "JPEG", quality = 95)
 
             self.thumbnail.save(name = self.image.name, content = ContentFile(fp.getvalue()), save = False)
+
+            size = i.size
+            if (size[0] > 800 or size[1] > 800):
+                r = i.copy()
+                r.thumbnail((800, 800), img.ANTIALIAS)
+                fp = StringIO()
+                r.save(fp, "JPEG", quality = 95)
+
+                self.image.save(name = self.image.name, content = ContentFile(fp.getvalue()), save = False)
         except IOError:
             pass
 

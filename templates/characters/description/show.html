@@ -45,16 +45,21 @@
             {{ description.description|linebreaks }}
         </div>
     </div>
-    <div class="wrapper">
+    <div style="clear: left">
         <h3>Images</h3>
-        {% for image in morph.images.all %}
-        <div>
-            <a href="{{ image.image.get_absolute_url }}"><img src="/media/{{ image.image.thumbnail }}" alt="{{ image.image.attribution }}" /></a><br />
+        {% for image in description.images.all %}
+        {% cycle "<div class=\"wrapper\">" "" %}
+        <div class="wrapper" style="height: 200px;{% if forloop.counter0|divisibleby:"4" %} clear: left;{% endif %}">
+            <a href="{{ image.image.get_absolute_url }}"><img class="thumb{{ image.image.rating }}" src="/media/{{ image.image.thumbnail }}" alt="{{ image.image.attribution }}" /></a><br />
             {{ image.caption }}
-            {% if character.user == user %}
+            {% if description.user == user %}
             <a href="/image/{{ image.id }}/detach/">[X]</a>
             {% endif %}
         </div>
+        {% cycle "" "</div>" %}
+        {% if forloop.last and not forloop.counter|divisibleby:"2" %}
+        </div>
+        {% endif %}
         {% endfor %}
     </div>
 </div>

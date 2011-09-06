@@ -36,7 +36,10 @@ urlpatterns = patterns('charref.characters.views',
     (r'^c(haracter)?/(?P<character_id>\d+)/delete/$', 'delete_character'),
     (r'^m(orph)?/(?P<morph_id>\d+)/delete/$', 'delete_morph'),
     (r'^d(escription)?/(?P<description_id>\d+)/delete/$', 'delete_description'),
-    (r'^l(ocation)?/(?P<location_id>\d+)/delete$', 'delete_location'),
+    (r'^l(ocation)?/(?P<location_id>\d+)/delete/$', 'delete_location'),
+
+    (r'^l(ocation)?/(?P<location_id>\d+)/attach/$', 'attach_character_to_location'),
+    (r'^location/(?P<characterlocation_id>\d+)/detach/$', 'detach_character_from_location'),
 
     (r'^_species/$', 'ajax_list_species')
 )

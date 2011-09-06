@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rev="canonical" type="text/html" href="http://c.o-f.co/l/{{ location.id }}" />
+<script type="text/javascript">
+    $(function () {
+        $('#imageBay').dialog({ 
+            autoOpen: false,
+            width: 300,
+            height: 400,
+            modal: true
+        });
+        $('#attachForm').dialog({ 
+            autoOpen: false,
+            width: 400,
+            height: 200,
+            modal: true
+        });
+    });
+</script>
+{% endblock %}
+
+{% block title %}{{ location.name }} (location) - {% endblock %}
+
+{% block header %}<a href="/locations">Locations</a> / {{ location.name }}{% endblock %}
+
+{% block content %}
+<div id="twoway">
+    <div class="wrapper">
+        <div>{{ location.description|safe }}</div>
+        <p><strong>Owner:</strong> <a href="/~{{ location.user.username }}">~{{ location.user }}</a></p>
+        {% if location.user == user %}
+        <p><a href="{{ location.get_absolute_url }}/edit">Edit this location</a></p>
+        {% endif %}
+        <div class="small">Permalink: <a href="http://c.o-f.co/l/{{ location.id }}">http://c.o-f.co/l/{{ location.id }}</a></div>
+        <h3>Images</h3>
+        {% for image in location.images.all %}
+        <div>
+            <a href="{{ image.image.get_absolute_url }}"><img src="/media/{{ image.image.thumbnail }}" alt="{{ image.image.attribution }}" /></a><br />
+            {{ image.caption }}
+            {% if location.user == user %}
+            <a href="/image/{{ image.id }}/detach/">[X]</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <div class="astream">
+            <ul>
+                {% for si in location.stream_items.all %}
+                {% if forloop.counter < 10 %}
+                <li class="{% cycle "odd" "even" %}" title="{{ si.action_time|date:"DATETIME_FORMAT" }}"><a href="/~{{ si.user.username }}">~{{ si.user.username }}</a> {{ si.get_action_type_display }} {{ location.name }} (location)</li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="wrapper">
+        {% if user.is_authenticated %}
+        <a href="javascript:void(0)" onclick="$('#attachForm').dialog('open')">+ Attach a character</a>
+        <div id="attachForm" title="Attach a character to this location">
+            <form method="get" action="/location/{{ location.id }}/attach">
+                <p><strong><label for="character_id">Character:</label></strong> <select name="character_id">
+                    {% for character in user.character_set.all %}
+                    <option value="{{ character.id }}">{{ character.name }}</option>
+                    {% endfor %}
+                </select></p>
+                <p><strong><label for="as">Name at location (if different):</label></strong> <input type="text" name="as" /></p>
+                <input type="submit" value="Attach character" />
+            </form>
+        </div>
+        {% endif %}
+        <div class="plist">
+            <ul>
+                {% for cl in location.characterlocation_set.all %}
+                <li class="{% cycle "odd" "even" %}">
+                    <a href="{{ cl.character.get_absolute_url }}">{{ cl.character.name }}</a>
+                    {% if cl.name_at_location != "" %}
+                    <em> as {{ cl.name_at_location }}</em>
+                    {% endif %}
+                    (<a href="/~{{ cl.character.user.username }}">~{{ cl.character.user.username }}</a>)
+                    {% if cl.character.user == user %}
+                    <a href="/location/{{ cl.id }}/detach">[X]</a>
+                    {% endif %}
+                    {% endfor %}
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% if location.user == user %}
+<div id="imageBay" title="Attach an image">
+    {% for image in user.image_set.all %}
+    <form method="post" action="/image/{{ image.id }}/attach/">
+        {% csrf_token %}
+        <input type="hidden" name="content_type" value="{{ location.get_content_type.id }}" />
+        <input type="hidden" name="object_id" value=" {{location.id }}" />
+        <p><input type="image" src="/media/{{ image.thumbnail }}" alt="Attach image" /></p>
+        <p><strong>Caption:</strong> <input type="text" name="caption" /></p>
+    </form>
+    {% if not forloop.last %}
+    <hr />
+    {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

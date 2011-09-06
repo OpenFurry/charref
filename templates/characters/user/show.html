@@ -56,7 +56,10 @@
     <div class="wrapper">
         <h3>Characters</h3>
         {% for character in user_object.character_set.all %}
-            <p><a href="{{ character.get_absolute_url }}">{{ character.name }}</a> - <a href="{{character.get_absolute_url }}/delete/">[X]</a></p>
+        <p><a href="{{ character.get_absolute_url }}">{{ character.name }}</a>
+        {% if user_object == user %}
+        - <a href="{{character.get_absolute_url }}/delete/">[X]</a></p>
+        {% endif %}
         {% endfor %}
         {% if user == user_object %}
             <a href="javascript:void(0)" onclick="$('#addCharacter').toggle()">+ Add Character</a>
@@ -73,12 +76,6 @@
                 </table>
             </form>
         {% endif %}
-    </div>
-    <div class="wrapper">
-        <h3>Images</h3>
-        {% for image in user_object.image_set.all %}
-        <a href="{{ image.get_absolute_url }}"><img src="/media/{{ image.thumbnail }}" /></a>
-        {% endfor %}
     </div>
 </div>
 {% endblock %}
