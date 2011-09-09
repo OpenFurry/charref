@@ -10,6 +10,12 @@
             height: 400,
             modal: true
         });
+        $('#createMorph').dialog({ 
+            autoOpen: false,
+            width: 400,
+            height: 200,
+            modal: true
+        });
         $('#gender-preselect').change(function(event) {
             var preselect = this;
             $('#gender').val($(preselect).val());
@@ -56,37 +62,39 @@
         {% endfor %}
         {% if user == character.user %}
             <hr />
-            <a href="javascript:void(0)" onclick="$('#createMorph').toggle()">+ Add morph</a>
-            <form method="post" action="/morph/create/" id="createMorph" style="display: none">
-                {% csrf_token %}
-                <input type="hidden" name="character" value="{{ character.id }}" />
-                <table>
-                    <tr>
-                        <th><label for="gender">Gender:</label></th>
-                        <td>
-                            <select id="gender-preselect">
-                                <option value="">-- Select --</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Herm">Herm</option>
-                                <option value="Other">Other...</option>
-                            </select>
-                            <input type="text" id="gender" name="gender" style="display: none" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><label for="species_category">Species category</label></th>
-                        <td>{{ species_select|safe }}</td>
-                    </tr>
-                    <tr>
-                        <th><label for="species_text">Species:</label></th>
-                        <td><input type="text" name="species_text" /></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2"><input type="submit" value="Create morph" /></td>
-                    </tr>
-                </table>
-            </form>
+            <a href="javascript:void(0)" onclick="$('#createMorph').dialog('open')">+ Add morph</a>
+            <div id="createMorph" title="Create morph">
+                <form method="post" action="/morph/create/">
+                    {% csrf_token %}
+                    <input type="hidden" name="character" value="{{ character.id }}" />
+                    <table>
+                        <tr>
+                            <th><label for="gender">Gender:</label></th>
+                            <td>
+                                <select id="gender-preselect">
+                                    <option value="">-- Select --</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Herm">Herm</option>
+                                    <option value="Other">Other...</option>
+                                </select>
+                                <input type="text" id="gender" name="gender" style="display: none" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label class="tipsify" title="This is just a generic category used for organization; feel free to specify whatever you want in 'species text'!" for="species_category">Species category</label></th>
+                            <td>{{ species_select|safe }}</td>
+                        </tr>
+                        <tr>
+                            <th><label for="species_text">Species:</label></th>
+                            <td><input type="text" name="species_text" /></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="submit" value="Create morph" /></td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
         {% endif %}
     </div>
     <div style="clear: left">

@@ -20,6 +20,7 @@
         <p><strong>Characters:</strong> {{ user_object.character_set.count }}
         <p><strong>Morphs:</strong> {{ user_object.morph_set.count }}
         <p><strong>Descriptions:</strong> {{ user_object.description_set.count }}
+        <p><strong>Images:</strong> {{ user_object.image_set.count }} (<a href="/~{{ user_object.username }}/images">list</a>)</p>
         <p><strong>Locations (as owner):</strong> {{ user_object.location_set.count }}
         {% if user == user_object %}
             <hr />

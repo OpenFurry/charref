@@ -501,16 +501,31 @@ def detach_character_from_location(request, characterlocation_id):
 
 def ajax_list_species(request):
     import json
+    categories = {}
     species = {}
+    to_return = {'name': 'species', 'children': []}
     for morph in Morph.objects.all():
-        if (morph.species_category.parent.name not in species):
-            species.update({morph.species_category.parent.name: { 'category': morph.species_category.name, 'count': 1 }})
+        if (morph.species_category.parent.name not in categories):
+            categories.update({morph.species_category.parent.name: {'name': morph.species_category.parent.name, 'children': []}})
+        if (morph.species_category.__unicode__() not in species):
+            species.update({morph.species_category.__unicode__(): {'count': 1, 'parent': morph.species_category.parent.name}})
         else:
-            if (morph.species_category.name not in species[morph.species_category.parent.name]):
-                species[morph.species_category.parent.name].update({morph.species_category.name: { 'category': morph.species_category.name, 'count': 1 }})
-            else:
-                species[morph.species_category.parent.name].update({morph.species_category.name: { 'category': morph.species_category.name, 'count': species[morph.species_category.parent.name][morph.species_category.name]['count'] + 1 }})
-    return HttpResponse(json.dumps(species), mimetype = "application/json")
+            species.update({morph.species_category.__unicode__(): {'count': species[morph.species_category.__unicode__()]['count'] + 1, 'parent': morph.species_category.parent.name }})
+    for k, v in species.iteritems():
+        categories[v['parent']]['children'].append({'name': k, 'count': v['count']})
+    for v in categories.values():
+        to_return['children'].append(v)
+    return HttpResponse(json.dumps(to_return), mimetype = "application/json")
+
+def ajax_list_genders(request):
+    import json
+    to_return = {}
+    for morph in Morph.objects.all():
+        if (morph.gender not in to_return):
+            to_return.update({morph.gender: 1})
+        else:
+            to_return.update({morph.gender: to_return[morph.gender] + 1})
+    return HttpResponse(json.dumps(to_return), mimetype = "application/json")
 
 ##
 

@@ -5,25 +5,33 @@
 {% block header %}Edit Image{% endblock %}
 
 {% block content %}
-<div class="wrapper">
-    <form enctype="multipart/form-data" method="post" action=".">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
-        {% for field in form.hidden_fields %}
-        {{ field }}
-        {% endfor %}
-        <table>
-            {% for field in form.visible_fields %}
-            <tr>
-                <th>{{ field.label }}</th>
-                <td>{{ field }}</td>
-                <td>{{ field.errors }}</td>
-            </tr>
+<div id="twoway">
+    <div class="wrapper">
+        <p>Here you can create or update an image.  Keep in mind that, as these are for reference only, they will be resized to a maximum of 800 pixels!</p>
+        <h3>Terms</h3>
+        <p>By uploading an image here, you agree that it belongs to you - that is, that either you created it, or it was created for you.</p>
+        <p>Simple terms for now, but they may grow as time goes on, so keep an eye out here!</p>
+    </div>
+    <div class="wrapper">
+        <form enctype="multipart/form-data" method="post" action=".">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            {% for field in form.hidden_fields %}
+            {{ field }}
             {% endfor %}
-            <tr>
-                <td colspan="3"><input type="submit" value="Save image" /></td>
-            </tr>
-        </table>
+            <table>
+                {% for field in form.visible_fields %}
+                <tr>
+                    <th>{{ field.label }}</th>
+                    <td>{{ field }}</td>
+                    <td>{{ field.errors }}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="3"><input type="submit" value="Save image" /></td>
+                </tr>
+            </table>
+        </form>
     </div>
 </div>
 {% endblock %}

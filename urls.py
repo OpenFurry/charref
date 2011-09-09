@@ -41,7 +41,8 @@ urlpatterns = patterns('charref.characters.views',
     (r'^l(ocation)?/(?P<location_id>\d+)/attach/$', 'attach_character_to_location'),
     (r'^location/(?P<characterlocation_id>\d+)/detach/$', 'detach_character_from_location'),
 
-    (r'^_species/$', 'ajax_list_species')
+    (r'^_species/$', 'ajax_list_species'),
+    (r'^_genders/$', 'ajax_list_genders')
 )
 
 urlpatterns += patterns('charref.gallery.views',

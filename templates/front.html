@@ -1,14 +1,8 @@
 {% extends "base.html" %}
 
 {% block head %}
-<script type="text/javascript">
-    var species;
-    $(function() {
-        $.get('/_species/', {}, function(data, status, jqXHR) {
-            species = data;
-        }, "json");
-    });
-</script>
+<script type="text/javascript" src="http://lib.jnsq.us/d3/"></script>
+<script type="text/javascript" src="http://lib.jnsq.us/d3-layout/"></script>
 {% endblock %}
 
 {% block header %}Welcome!{% endblock %}
@@ -23,15 +17,22 @@
     <div class="wrapper">
         <h3>Stats</h3>
         <div class="wrapper">
-            <p><strong>Users:</strong> {{ counts.users }} (<a href="/users">list</a>)</p>
-            <p><strong>Characters:</strong> {{ counts.characters }}</p>
-            <p><strong>Morphs:</strong> {{ counts.morphs }}</p>
-            <p><strong>Descriptions:</strong> {{ counts.descriptions }}</p>
-            <p><strong>Images:</strong> {{ counts.images }}</p>
-            <p><strong>Locations:</strong> {{ counts.locations }} (<a href="/locations">list</a>)</p>
+            <p><strong class="tipsify" title="Users of this site">Users:</strong> {{ counts.users }} (<a href="/users">list</a>)</p>
+            <p><strong class="tipsify" title="Characters are representations of yourself - you may have more than one, and they may have different shapes (morphs)!">Characters:</strong> {{ counts.characters }}</p>
+            <p><strong class="tipsify" title="Morphs are the different shapes your characters can take, broken down into gender and species.">Morphs:</strong> {{ counts.morphs }}</p>
+            <p><strong class="tipsify" title="Descriptions are used to show how your character's morph looks - you can have more than one, like &quot;clothed&quot; or &quot;battle-ready&quot;!">Descriptions:</strong> {{ counts.descriptions }}</p>
+            <p><strong class="tipsify" title="You may upload images, then attach them to characters, morphs, and descriptions as references!">Images:</strong> {{ counts.images }}</p>
+            <p><strong class="tipsify" title="Locations are where to find your character on the &apos;net - you can attach characters to multiple locations!">Locations:</strong> {{ counts.locations }} (<a href="/locations">list</a>)</p>
         </div>
         <div class="wrapper">
-            Some other stats
+            <div id="species"></div>
+            <script type="text/javascript" src="/species.js"></script>
+            <p class="small">Species distribution (morphs)</p>
+        </div>
+        <div class="wrapper">
+            <div id="genders"></div>
+            <script type="text/javascript" src="/genders.js"></script>
+            <p class="small">Gender distribution (morphs)</p>
         </div>
     </div>
 </div>
