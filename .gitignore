@@ -1,4 +1,5 @@
 *.pyc
 public/media/*.json
 public/media/gallery
+sitesettings.py
 fix
