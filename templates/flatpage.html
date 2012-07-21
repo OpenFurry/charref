@@ -1,0 +1,16 @@
+{% extends "base-backbone.html" %}
+
+{% block title %}{{ flatpage.title }} - {% endblock %}
+
+{% block head %}
+<script type="text/javascript">
+    window.__route = '{{ flatpage.url }}'
+    window.__route = window.__route.substring(1, window.__route.length - 1);
+</script>
+{% endblock %}
+
+{% block content %}
+<div id="twoway">
+    {{ flatpage.content|safe }}
+</div>
+{% endblock %}

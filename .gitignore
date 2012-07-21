@@ -1,1 +1,4 @@
 *.pyc
+public/media/*.json
+public/media/gallery
+fix

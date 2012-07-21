@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Edit user - {% endblock %}
+
+{% block header %}Edit user{% endblock %}
+
+{% block content %}
+<div id="twoway">
+    {% if user == user_object %}
+        <div id="updateform">
+            {% for error in form.errors %}
+                {{ error }}
+            {% endfor %}
+            <form method="post" action="/~{{ user.username }}/edit/">
+                {% csrf_token %}
+                <table>
+                    <tr>
+                        <th><label for="firstname">First name:</label></th>
+                        <td><input type="text" name="first_name" value="{{ user.first_name }}" /></td>
+                    </tr>
+                    <tr>
+                        <th><label for="firstname">Last name:</label></th>
+                        <td><input type="text" name="last_name" value="{{ user.last_name }}" /></td>
+                    </tr>
+                    <tr>
+                        <th><label for="firstname">E-mail:</label></th>
+                        <td><input type="text" name="email" value="{{ user.email }}" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><input type="submit" value="Save" /></td>
+                    </tr>
+                </table>
+            </form>
+            <a href="/accounts/password/change/">Change password</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

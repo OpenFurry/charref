@@ -1,7 +1,10 @@
-{% extends "base.html" %}
+{% extends "base-backbone.html" %}
 
 {% block head %}
 <link rev="canonical" type="text/html" href="http://c.o-f.co/i/{{ image.id }}" />
+<script type="text/javascript">
+    window.__route = 'image/{{ image.id }}';
+</script>
 {% endblock %}
 
 {% block title %}Image - {% endblock %}
@@ -26,17 +29,17 @@
             {% endfor %}
         </ul>
         {% if image.user == user %}
-        <p><a href="{{ image.get_absolute_url }}/edit">Edit this image</a></p>
-        <p><a href="{{ image.get_absolute_url }}/delete">Delete this image</a></p>
+        <p class="addLink"><a href="{{ image.get_absolute_url }}/edit">Edit this image</a></p>
+        <p class="addLink"><a href="{{ image.get_absolute_url }}/delete">Delete this image</a></p>
         {% endif %}
         <hr />
-        <div class="astream">
+        <!--<div class="astream">
             <ul>
                 {% for si in image.stream_items.all %}
                 <li class="{% cycle "odd" "even" %}" title="{{ si.action_time|date:"DATETIME_FORMAT" }}"><a href="/~{{ si.user.username }}">~{{ si.user.username }}</a> {{ si.get_action_type_display }} image {{ image.id }}</li>
                 {% endfor %}
             </ul>
-        </div>
+        </div>-->
         <div class="small">Permalink: <a href="http://c.o-f.co/i/{{ image.id }}">http://c.o-f.co/i/{{ image.id }}</a></div>
     </div>
 </div>

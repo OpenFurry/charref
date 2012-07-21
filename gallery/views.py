@@ -8,20 +8,43 @@ from django.contrib.contenttypes.models import ContentType
 from charref.gallery.models import *
 from charref.gallery.forms import *
 from charref.activitystream.models import *
+from charref.usermgmt.models import *
 
 def show_image(request, image_id):
     image = get_object_or_404(Image, id = image_id)
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
-        return HttpResponse(serializers.serialize("json", (image,)), mimetype = "application/json")
+        import json
+        return HttpResponse(json.dumps({
+            'fields': {
+                'id': image.id,
+                'thumbnail': image.thumbnail.url,
+                'image': image.image.url,
+                'attribution': image.attribution,
+                'rating': image.rating,
+                'rating_display': image.get_rating_display(),
+                'user': image.user.username
+            },
+            'is_owner': request.user == image.user
+        }), mimetype = "application/json")
     else:
         return render_to_response('gallery/image/show.html', context_instance = RequestContext(request, {'image': image}))
 
 def list_images_for_user(request, username):
     user = get_object_or_404(User, username = username)
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
-        return HttpResponse(serializers.serialize("json", images), mimetype = "application/json")
+        return HttpResponse(serializers.serialize("json", user.image_set.all()), mimetype = "application/json")
     else:
         return render_to_response('gallery/image/list.html', context_instance = RequestContext(request, {'user_object': user}))
+
+def list_images_for_current_user(request):
+    user = request.user
+    if (user.is_authenticated()):
+        if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
+            return HttpResponse(serializers.serialize("json", user.image_set.all()), mimetype = "application/json")
+        else:
+            return render_to_response('gallery/image/list.html', context_instance = RequestContext(request, {'user_object': user}))
+    else:
+        return HttpResponse('[]', mimetype = "application/json")
 
 def list_images_attached_to_object(request, app_name, model, object_id):
     ias = ContentType.objects.get_by_natural_key(app_name, model).model_class().get(id = object_id).images.all()

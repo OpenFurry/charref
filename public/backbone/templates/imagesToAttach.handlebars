@@ -1,0 +1,17 @@
+{{#each images}}
+    <div>
+        <form method="post" action="/image/{{this.pk}}/attach/">
+            <div class="ntn"></div>
+            <input type="hidden" name="content_type" value="{{../contentType}}" />
+            <input type="hidden" name="object_id" value="{{../objectId}}" />
+            <p>
+                <input type="image" alt="Attach image" src="/media/{{this.fields.thumbnail}}" />
+            </p>
+            <p>
+                <strong>Caption:</strong>
+                <input type="text" name="caption" />
+            </p>
+            <hr />
+        </form>
+    </div>
+{{/each}}

@@ -1,7 +1,10 @@
-{% extends "base.html" %}
+{% extends "base-backbone.html" %}
 
 {% block head %}
 <link rev="canonical" type="text/html" href="http://c.o-f.co/~{{ user_object.username }}" />
+<script type="text/javascript">
+    window.__route = '~{{user_object.username}}';
+</script>
 {% endblock %}
 
 {% block title %}{{ user_object.username }} (user) - {% endblock %}
@@ -20,11 +23,16 @@
         <p><strong>Characters:</strong> {{ user_object.character_set.count }}
         <p><strong>Morphs:</strong> {{ user_object.morph_set.count }}
         <p><strong>Descriptions:</strong> {{ user_object.description_set.count }}
-        <p><strong>Images:</strong> {{ user_object.image_set.count }} (<a href="/~{{ user_object.username }}/images">list</a>)</p>
+        <p>
+            <strong>Images:</strong> {{ user_object.image_set.count }} (<a href="/~{{ user_object.username }}/images">list</a>)
+            {% if user == user_object %}
+            <a href="/image/create/">+ Add image</a>
+            {% endif %}
+        </p>
         <p><strong>Locations (as owner):</strong> {{ user_object.location_set.count }}
         {% if user == user_object %}
             <hr />
-            <a href="javascript:void(0)" onclick="$('#updateform').toggle()">Edit info</a>
+            <p class="addLink"><a href="javascript:void(0)" onclick="$('#updateform').toggle()">Edit info</a></p>
             <div id="updateform" style="display: none">
                 {% for error in form.errors %}
                     {{ error }}
@@ -63,7 +71,7 @@
         {% endif %}
         {% endfor %}
         {% if user == user_object %}
-            <a href="javascript:void(0)" onclick="$('#addCharacter').toggle()">+ Add Character</a>
+            <p class="addLink"><a href="javascript:void(0)" onclick="$('#addCharacter').toggle()">+ Add Character</a></p>
             <form method="post" action="/character/create/" id="addCharacter" style="display: none">
                 {% csrf_token %}
                 <table>

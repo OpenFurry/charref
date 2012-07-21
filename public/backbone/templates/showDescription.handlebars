@@ -1,0 +1,34 @@
+<div id="twoway">
+    <div class="wrapper">
+        <h3>Stats</h3>
+        <p><strong>Description name:</strong> {{fields.name}}</p>
+        <p><strong>Description rating:</strong> {{fields.rating_display}}</p>
+        <p><strong>Description owner:</strong> <a class="push" href="/~{{fields.user}}">{{fields.user}}</a></p>
+        {{#if is_owner}}
+            <p class="addLink"><a href="/description/{{fields.id}}/edit">Edit this description</a></p>
+            <p class="addLink"><a id="attachImages" href="javascript:void(0)" onclick="App.imagesToAttachView.render();$('#imageBay').dialog(ibDialogOptions);">Attach image</a></p>
+        {{/if}}
+        <p class="small">Permalink: <a href="http://c.o-f.co/d/{{fields.id}}">http://c.o-f.co/d/{{fields.id}}</a></p>
+    </div>
+    <div class="wrapper">
+        <h3>Description</h3>
+        {{#if_neq fields.rating "G"}}
+            <p class="small">Click to show in full</p>
+        {{/if_neq}}
+        <div id="descriptiontext" onclick="$(this).toggleClass('showdescription');" class="description{{fields.rating}}">
+            {{{linebreaks fields.description}}}
+        </div>
+    </div>
+    <div id="imagesForItem"></div>
+</div>
+<script type="text/javascript">
+    var ibDialogOptions = { 
+        width: 300,
+        height: 400,
+        modal: true,
+        autoOpen: true
+    };
+    //$(document).ready(function() {
+        $('.ntn').append($('#nnt').html());
+    //});
+</script>

@@ -1,8 +1,9 @@
-{% extends "base.html" %}
+{% extends "base-backbone.html" %}
 
 {% block head %}
 <link rev="canonical" type="text/html" href="http://c.o-f.co/c/{{ character.id }}" />
 <script type="text/javascript">
+    window.__route = 'character/{{character.id}}';
     $(function () {
         $('#imageBay').dialog({ 
             autoOpen: false,
@@ -40,16 +41,16 @@
         <p><strong>Character name:</strong> {{ character.name }}</p>
         <p><strong>Character owner:</strong> <a href="/~{{ character.user.username }}">{{ character.user.username }}</a></p>
         {% if character.user == user %}
-        <p><a href="{{ character.get_absolute_url }}/edit">Edit this character</a></p>
-        <p><a href="javascript:void(0)" onclick="$('#imageBay').dialog('open');">Attach image</a></p>
+        <p class="addLink"><a href="{{ character.get_absolute_url }}/edit">Edit this character</a></p>
+        <p class="addLink"><a href="javascript:void(0)" onclick="$('#imageBay').dialog('open');">Attach image</a></p>
         {% endif %}
-        <div class="astream">
+        <!--<div class="astream">
             <ul>
                 {% for si in character.stream_items.all %}
                 <li class="{% cycle "odd" "even" %}" title="{{ si.action_time|date:"DATETIME_FORMAT" }}"><a href="/~{{ si.user.username }}">~{{ si.user.username }}</a> {{ si.get_action_type_display }} {{ character.name }} (character)</li>
                 {% endfor %}
             </ul>
-        </div>
+        </div>-->
         <div class="small">Permalink: <a href="http://c.o-f.co/c/{{ character.id }}">http://c.o-f.co/c/{{character.id }}</a></div>
     </div>
     <div class="wrapper">
@@ -62,7 +63,7 @@
         {% endfor %}
         {% if user == character.user %}
             <hr />
-            <a href="javascript:void(0)" onclick="$('#createMorph').dialog('open')">+ Add morph</a>
+            <p class="addLink"><a href="javascript:void(0)" onclick="$('#createMorph').dialog('open')">+ Add morph</a></p>
             <div id="createMorph" title="Create morph">
                 <form method="post" action="/morph/create/">
                     {% csrf_token %}
@@ -115,20 +116,4 @@
         {% endfor %}
     </div>
 </div>
-{% if character.user == user %}
-<div id="imageBay" title="Attach an image">
-    {% for image in user.image_set.all %}
-    <form method="post" action="/image/{{ image.id }}/attach/">
-        {% csrf_token %}
-        <input type="hidden" name="content_type" value="{{ character.get_content_type.id }}" />
-        <input type="hidden" name="object_id" value=" {{character.id }}" />
-        <p><input type="image" src="/media/{{ image.thumbnail }}" alt="Attach image" /></p>
-        <p><strong>Caption:</strong> <input type="text" name="caption" /></p>
-    </form>
-    {% if not forloop.last %}
-    <hr />
-    {% endif %}
-    {% endfor %}
-</div>
-{% endif %}
 {% endblock %}

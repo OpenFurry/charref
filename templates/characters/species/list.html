@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Species - {% endblock %}
+
+{% block header %}Species{% endblock %}
+
+{% block content %}
+<div id="twoway" class="plist">
+    <div class="wrapper">
+        Species categories are general categories that are applied to morphs of a character, while still allowing free-form text to be applied.  This way, it can be easier to sort through all of the various morphs on the site, as well as collect some demographic information for the charts on the front page.
+    </div>
+    <div class="wrapper">
+        <ul>
+            {% for s in species %}
+            <li>
+            <strong>{{ s }}</strong> <span class="small">[<a href="javascript:void(0)" onclick="$(this).parent().parent().children('ul').toggle();$(this).text()=='expand'?$(this).text('collapse'):$(this).text('expand');">expand</a>]</span>
+            <ul style="display: none;">
+                {% for ss in s.speciescategory_set.all %}
+                <li>
+                <div style="margin: 0;padding: 0.25em" class="{% cycle "odd" "even" %}">{{ ss.name }} - {{ ss.morph_set.count }} morphs {% if ss.morph_set.count > 0 %}<span class="small">[<a href="javascript:void(0)" onclick="$(this).parent().parent().parent().children('ul').toggle();$(this).text()=='expand'?$(this).text('collapse'):$(this).text('expand');">expand</a>]</span>{% endif %}</div>
+
+                <ul style="display: none">
+                    {% for m in ss.morph_set.all %}
+                    <li><a href="{{ m.get_absolute_url }}">{{ m.gender }} {{ m.species_text }}</a> (<a href="/~{{ m.user.username }}">~{{ m.user.username }}</a>)</li>
+                    {% endfor %}
+                </ul>
+                </li>
+                {% endfor %}
+            </ul>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

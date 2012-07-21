@@ -1,9 +1,10 @@
-{% extends "base.html" %}
+{% extends "base-backbone.html" %}
 
 {% block head %}
 <link rev="canonical" type="text/html" href="http://c.o-f.co/d/{{ description.id }}" />
 <script type="text/javascript">
     $(function () {
+        window.__route = 'description/{{ description.id }}';
         $('#imageBay').dialog({ 
             autoOpen: false,
             width: 300,
@@ -27,17 +28,17 @@
         <p><strong>Description rating:</strong> {{ description.get_rating_display }}</p>
         <p><strong>Description owner:</strong> <a href="/~{{ description.user.username }}">{{ description.user.username }}</a></p>
         {% if description.user == user %}
-        <p><a href="{{ description.get_absolute_url }}/edit">Edit this description</a></p>
-        <p><a href="javascript:void(0)" onclick="$('#imageBay').dialog('open');">Attach image</a></p>
+        <p class="addLink"><a href="{{ description.get_absolute_url }}/edit">Edit this description</a></p>
+        <p class="addLink"><a href="javascript:void(0)" onclick="$('#imageBay').dialog('open');">Attach image</a></p>
         {% endif %}
-        <div class="astream">
+        <!--<div class="astream">
             <h3>Activity stream</h3>
             <ul>
                 {% for si in description.stream_items.all %}
                 <li class="{% cycle "odd" "even" %}" title="{{ si.action_time|date:"DATETIME_FORMAT" }}"><a href="/~{{ si.user.username }}">~{{ si.user.username }}</a> {{ si.get_action_type_display }} {{ description.name }} (description)</li>
                 {% endfor %}
             </ul>
-        </div>
+        </div>-->
         <div class="small">Permalink: <a href="http://c.o-f.co/d/{{ description.id }}">http://c.o-f.co/d/{{ description.id }}</a></div>
     </div>
     <div class="wrapper">
@@ -67,20 +68,4 @@
         {% endfor %}
     </div>
 </div>
-{% if description.user == user %}
-<div id="imageBay" title="Attach an image">
-    {% for image in user.image_set.all %}
-    <form method="post" action="/image/{{ image.id }}/attach/">
-        {% csrf_token %}
-        <input type="hidden" name="content_type" value="{{ description.get_content_type.id }}" />
-        <input type="hidden" name="object_id" value=" {{ description.id }}" />
-        <p><input type="image" src="/media/{{ image.thumbnail }}" alt="Attach image" /></p>
-        <p><strong>Caption:</strong> <input type="text" name="caption" /></p>
-    </form>
-    {% if not forloop.last %}
-    <hr />
-    {% endif %}
-    {% endfor %}
-</div>
-{% endif %}
 {% endblock %}

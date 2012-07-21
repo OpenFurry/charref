@@ -1,0 +1,34 @@
+<div id="twoway">
+    <div class="wrapper">
+        <h3>We're all characters, here!</h3>
+        <p>Welcome to Characters @ OpenFurry!  This is the place to keep character descriptions and reference images - if you need to show an artist, simply link them to the character, a morph of that character, or a specific description pertaining to that morph.  You can associate images (following a by-me/for-me policy similar to FurAffinity's) with your characters, morphs, and descriptions.</p>
+        <p>Characters is a work in progress, so look forward to also having the ability to store RP logs associated with one or more characters, per-user permissions (whitelist or blacklist), and a snazzy new interface!</p>
+    </div>
+    <div class="wrapper">
+        <h3>At a glance</h3>
+        <div class="wrapper">
+            <p><strong class="tipsify" title="Users of this site">Users:</strong> {{data.counts.users}} (<a href="/users">list</a>)</p>
+            <p><strong class="tipsify" title="Characters are representations of yourself - you may have more than one, and they may have different shapes (morphs)!">Characters:</strong> {{data.counts.characters}}</p>
+            <p><strong class="tipsify" title="Morphs are the different shapes your characters can take, broken down into gender and species.">Morphs:</strong> {{data.counts.morphs}}</p>
+            <p><strong class="tipsify" title="Descriptions are used to show how your character's morph looks - you can have more than one, like &quot;clothed&quot; or &quot;battle-ready&quot;!">Descriptions:</strong> {{data.counts.descriptions}}</p>
+            <p><strong class="tipsify" title="You may upload images, then attach them to characters, morphs, and descriptions as references!">Images:</strong> {{data.counts.images}}</p>
+            <p><strong class="tipsify" title="Locations are where to find your character on the &apos;net - you can attach characters to multiple locations!">Locations:</strong> {{data.counts.locations}} (<a href="/locations">list</a>)</p>
+        </div>
+        <div class="wrapper">
+            <p><strong>Most recent user:</strong> <a href="#/~{{data.new_user}}">~{{data.new_user}}</a></p>
+            <p><strong>Random morph:</strong> <a href="#/~{{data.random_morph.user}}">~{{data.random_morph.user}}</a>
+            / <a href="#/character/{{data.random_morph.character.id}}">{{data.random_morph.character.name}}</a>
+            / <a href="#/morph/{{data.random_morph.morph.id}}">{{data.random_morph.morph.display}}</a></p>
+        </div>
+        <div class="wrapper" style="clear: left">
+            <div id="species"></div>
+            <script type="text/javascript" src="/species.js"></script>
+            <p class="small">Species (morphs)</p>
+        </div>
+        <div class="wrapper">
+            <div id="genders"></div>
+            <script type="text/javascript" src="/genders.js"></script>
+            <p class="small">Gender (morphs)</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,13 @@
+<div style="clear: left">
+    <h3>Images</h3>
+    {{#each images}}
+        <div class="wrapper galleryThumb" style="height: 200px">
+            <a class="push" href="/image/{{this.image_id}}"><img alt="{{this.attribution}}" src="{{this.thumbnail}}" class="thumb{{this.rating}}" /></a>
+            <br />
+            {{this.caption}}
+            {{#if ../is_owner}}
+                <a href="/image/{{this.id}}/detach/">[X]</a>
+            {{/if}}
+        </div>
+    {{/each}}
+</div>

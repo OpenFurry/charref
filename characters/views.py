@@ -6,12 +6,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.paginator import Paginator
+from django.views.decorators.csrf import csrf_protect
 from charref.characters.models import *
 from charref.gallery.models import Image
 from charref.characters.forms import *
 from charref.activitystream.models import *
+from charref.usermgmt.models import *
 
 def front(request):
+    import random
     counts = {
             'users': User.objects.count(),
             'locations': Location.objects.count(),
@@ -20,16 +23,38 @@ def front(request):
             'descriptions': Description.objects.count(),
             'images': Image.objects.count()
             }
-    return render_to_response('front.html', context_instance = RequestContext(request, {'counts': counts}))
+    new_user = User.objects.order_by('-date_joined')[0]
+    random_morph = Morph.objects.all()[random.randint(0, Morph.objects.count() - 1)]
+    if (request.GET.get('ajax', None) is not None or request.is_ajax()):
+        import json
+        return HttpResponse(json.dumps({
+            'counts': counts, 
+            'new_user': new_user.username, 
+            'random_morph': { 
+                'user': random_morph.user.username, 
+                'character': { 'id': random_morph.character.id, 'name': random_morph.character.name }, 
+                'morph': { 'id': random_morph.id, 'display': "%s %s" % (random_morph.gender, random_morph.species_text) }
+            } 
+        }), mimetype = "application/json")
+    else:
+        return render_to_response('front.html', context_instance = RequestContext(request, {'counts': counts, 'new_user': new_user, 'random_morph': random_morph}))
 
+@csrf_protect
 def ng(request):
+    if (request.user.is_authenticated()):
+        if (UserProperty.objects.filter(user = request.user, key = "nong").count() > 0):
+             return HttpResponseRedirect('/')
     return render_to_response('front-ng.html', context_instance = RequestContext(request, {}))
+
+@csrf_protect
+def app(request):
+    return render_to_response('front-backbone.html', context_instance = RequestContext(request, {}))
 
 def redirect_after_login(request):
     return HttpResponseRedirect('/~%s' % request.user.username)
 
 def list_users(request):
-    query = User.objects.all()
+    query = User.objects.order_by('username')
     paginator = Paginator(query, 10)
 
     try:
@@ -43,14 +68,23 @@ def list_users(request):
         logs = paginator.page(paginator.num_pages)
 
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
-        return HttpResponse(serializers.serialize("json", users), mimetype = "application/json")
+        return HttpResponse(serializers.serialize("json", [users]), mimetype = "application/json")
     else:
         return render_to_response('characters/user/list.html', context_instance = RequestContext(request, {'users': users}))
 
 def show_user(request, username):
     user = get_object_or_404(User, username = username)
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
-        return HttpResponse(serializers.serialize("json", (user,)), mimetype = "application/json")
+        import json
+        return HttpResponse(json.dumps({
+            'fields': { 'username': user.username, 'name': user.get_full_name(), 'date_joined': user.date_joined.strftime("%m/%d/%Y"), 'is_active': user.is_active, 'is_staff': user.is_staff, 'is_superuser': user.is_superuser, 'email': user.email },
+            'characters': [ {'name': i.name, 'id': i.id} for i in user.character_set.all() ],
+            'morphs': user.morph_set.count(),
+            'descriptions': user.description_set.count(),
+            'images': user.image_set.count(),
+            'locations': user.location_set.count(),
+            'is_owner': request.user == user
+        }), mimetype = "application/json")
     else:
         return render_to_response('characters/user/show.html', context_instance = RequestContext(request, {'user_object': user}))
 
@@ -71,7 +105,7 @@ def edit_user(request, username):
                     object_id = request.user.id)
             si.save()
             return HttpResponseRedirect("/~%s" % request.user.username)
-    return render_to_response("characters/user/show.html", context_instance = RequestContext(request, {'form': form, 'user_object': request.user}))
+    return render_to_response("characters/user/edit.html", context_instance = RequestContext(request, {'form': form, 'user_object': request.user}))
 
 def register(request):
     if request.method == 'POST': 
@@ -123,7 +157,14 @@ def list_characters_for_user(request, username):
 def show_character(request, character_id):
     character = get_object_or_404(Character, id = character_id)
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
-        return HttpResponse(serializers.serialize("json", (character,)), mimetype = "application/json")
+        import json
+        return HttpResponse(json.dumps({
+            'fields': {'id': character.id, 'name': character.name, 'user': character.user.username},
+            'morphs': [ {'id': i.id, 'name': "%s %s" % (i.gender, i.species_text)} for i in character.morph_set.all() ],
+            'images': [ {'id': i.id, 'image_id': i.image.id, 'thumbnail': i.image.thumbnail.url, 'attribution': i.image.attribution, 'rating': i.image.rating, 'caption': i.caption} for i in character.images.all() ],
+            'is_owner': request.user == character.user,
+            'content_type_id': character.get_content_type().id
+        }), mimetype = "application/json")
     else:
         return render_to_response('characters/character/show.html', context_instance = RequestContext(request, {'character': character, 'species_select': _species_select_dropdown()}))
 
@@ -199,7 +240,25 @@ def list_morphs_for_character(request, character_id):
 def show_morph(request, morph_id):
     morph = get_object_or_404(Morph, id = morph_id)
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
-        return HttpResponse(serializers.serialize("json", (morph,)), mimetype = "application/json")
+        import json
+        return HttpResponse(json.dumps({
+            'fields': { 
+                'id': morph.id, 
+                'name': morph.get_name(),
+                'species_category': morph.species_category.__unicode__(), 
+                'species_text': morph.species_text, 
+                'gender': morph.gender, 
+                'user': morph.user.username, 
+                'character': { 
+                    'id': morph.character.id, 
+                    'name': morph.character.name
+                }
+            },
+            'descriptions': [ {'id': d.id, 'name': d.name, 'rating': d.get_rating_display()} for d in morph.description_set.all() ],
+            'images': [ {'id': i.id, 'image_id': i.image.id, 'thumbnail': i.image.thumbnail.url, 'attribution': i.image.attribution, 'rating': i.image.rating, 'caption': i.caption} for i in morph.images.all() ],
+            'is_owner': request.user == morph.user,
+            'content_type_id': morph.get_content_type().id
+        }), mimetype = "application/json")
     else:
         return render_to_response('characters/morph/show.html', context_instance = RequestContext(request,  {'morph': morph}))
 
@@ -221,6 +280,8 @@ def edit_morph(request, morph_id):
                     content_type = ContentType.objects.get_for_model(Morph),
                     object_id = morph_id)
             si.save()
+            ajax_list_species(request)
+            ajax_list_genders(request)
             return HttpResponseRedirect(morph.get_absolute_url())
     return render_to_response('characters/morph/edit.html', context_instance = RequestContext(request, {'form': form, 'species_category': _species_select_dropdown(morph.species_category.id)}))
 
@@ -248,6 +309,8 @@ def delete_morph(request, morph_id):
                 content_type = ContentType.objects.get_for_model(Character),
                 object_id = character.id)
         si.save()
+        ajax_list_species(request)
+        ajax_list_genders(request)
         return HttpResponseRedirect(character.get_absolute_url())
     else:
         return render_to_response('characters/morph/delete.html', context_instance = RequestContext(request, {'morph': morph}))
@@ -278,6 +341,8 @@ def create_morph(request):
                     content_type = ContentType.objects.get_for_model(Character),
                     object_id = morph.character.id)
             si.save()
+            ajax_list_species(request)
+            ajax_list_genders(request)
             return HttpResponseRedirect(morph.get_absolute_url())
     return render_to_response('characters/morph/edit.html', context_instance = RequestContext(request, {'form': form, 'species_category':  _species_select_dropdown()}))
 
@@ -293,7 +358,22 @@ def list_descriptions_for_morph(request, morph_id):
 def show_description(request, description_id):
     description = get_object_or_404(Description, id = description_id)
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
-        return HttpResponse(serializers.serialize("json", (description,)), mimetype = "application/json")
+        import json
+        return HttpResponse(json.dumps({
+            'fields': {
+                'id': description.id, 
+                'name': description.name,
+                'rating': description.rating, 
+                'rating_display': description.get_rating_display(), 
+                'description': description.description,
+                'user': description.user.username
+            },
+            'morph': { 'id': description.morph.id, 'name': description.morph.get_name() },
+            'character': { 'id': description.morph.character.id, 'name': description.morph.character.name },
+            'images': [ {'id': i.id, 'image_id': i.image.id, 'thumbnail': i.image.thumbnail.url, 'attribution': i.image.attribution, 'rating': i.image.rating, 'caption': i.caption} for i in description.images.all() ],
+            'is_owner': request.user == description.user,
+            'content_type_id': description.get_content_type().id
+        }), mimetype = "application/json")
     else:
         return render_to_response('characters/description/show.html', context_instance = RequestContext(request, {'description': description}))
 
@@ -499,8 +579,19 @@ def detach_character_from_location(request, characterlocation_id):
 
 ##
 
+def list_species(request):
+    species = SpeciesCategory.objects.filter(parent__isnull = True)
+    return render_to_response("characters/species/list.html", context_instance = RequestContext(request, {'species': species}))
+
+def show_species(request, species_id):
+    species = get_object_or_404(SpeciesCategory, id = species_id)
+    return render_to_response("characters/species/show.html", context_instance = RequestContext(request, {'species': species}))
+
+##
+
 def ajax_list_species(request):
     import json
+    from django.conf import settings
     categories = {}
     species = {}
     to_return = {'name': 'species', 'children': []}
@@ -515,19 +606,27 @@ def ajax_list_species(request):
         categories[v['parent']]['children'].append({'name': k, 'count': v['count']})
     for v in categories.values():
         to_return['children'].append(v)
+    with open(settings.MEDIA_ROOT + "species.json", "w") as f:
+        f.write(json.dumps(to_return))
     return HttpResponse(json.dumps(to_return), mimetype = "application/json")
 
 def ajax_list_genders(request):
     import json
+    from django.conf import settings
     to_return = {}
     for morph in Morph.objects.all():
         if (morph.gender not in to_return):
             to_return.update({morph.gender: 1})
         else:
             to_return.update({morph.gender: to_return[morph.gender] + 1})
+    with open(settings.MEDIA_ROOT + "genders.json", "w") as f:
+        f.write(json.dumps(to_return))
     return HttpResponse(json.dumps(to_return), mimetype = "application/json")
 
 ##
+
+def species_dropdown(request):
+    return HttpResponse(_species_select_dropdown())
 
 def _species_select_dropdown(selected = None):
     to_return = '<select name="species_category"><option>-- Select --</option>'

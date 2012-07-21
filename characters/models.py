@@ -32,6 +32,9 @@ class Morph(models.Model):
     def __unicode__(self):
         return "%s %s (~%s)" % (self.gender, self.species_text, self.user.username)
 
+    def get_name(self):
+        return "%s %s" % (self.gender, self.species_text)
+
     def get_absolute_url(self):
         return "/morph/%d" % self.id
 

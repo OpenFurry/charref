@@ -1,0 +1,46 @@
+<div id="twoway">
+    <div class="wrapper">
+        <h3>Stats</h3>
+        <p><strong>Username:</strong> {{user.fields.username}} {{status|html}}</p>
+        <p><strong>Name:</strong> {{user.fields.name}}</p>
+        <p><strong>User since:</strong> {{user.fields.date_joined}}</p>
+        <p><strong>Characters:</strong> {{user.characters.length}}</p>
+        <p><strong>Morphs:</strong> {{user.morphs}}</p>
+        <p><strong>Descriptions:</strong> {{user.descriptions}}</p>
+        <p>
+            <strong>Images:</strong> {{user.images}} (<a href="/~{{user.fields.username}}/images">list</a>)
+            <ng:switch on="user.is_owner"><span ng:switch-when="true"><a href="/image/create/">+ Add image</a></span></ng:switch>
+        </p>
+        <p><strong>Locations (as owner):</strong> {{user.locations}}</p>
+        <hr />
+        <ng:switch on="user.is_owner"><p class="addLink" ng:switch-when="true"><a href="/~{{user.fields.username}}/edit/">Edit info</a></p></ng:switch>
+        <p class="small">Permalink: <a href="http://c.o-f.co/~{{user.fields.username}}">http://c.o-f.co/~{{user.fields.username}}</a></p>
+    </div>
+    <div class="wrapper">
+        <h3>Characters</h3>
+        <p ng:repeat="character in user.characters">
+        <a href="#/character/{{character.id}}">{{character.name}}</a><ng:switch on="user.is_owner"><span ng:switch-when="true"> - <a href="/character/{{character.id}}/delete">[X]</a></span></ng:switch>
+        </p>
+        <hr />
+        <ng:switch on="user.is_owner"><div ng:switch-when="true">
+            <p class="addLink"><a href="javascript:void(0)" onclick="$('#addCharacter').toggle()">+ Add Character</a></p>
+            <form method="post" action="/character/create/" id="addCharacter" style="display: none">
+                <div id="ntn"></div>
+                <table>
+                    <tr>
+                        <th><label for="name">Character name:</label></th>
+                        <td><input type="text" name="name" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><input type="submit" value="Create character" /></td>
+                    </tr>
+                </table>
+            </form>
+        </div></ng:switch>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#ntn').append($('#nnt').html());
+    });
+</script>

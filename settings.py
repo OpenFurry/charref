@@ -13,11 +13,11 @@ DEFAULT_FROM_EMAIL = 'mjs+characters@mjs-svc.com'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'characters_openfurry_org',                      # Or path to database file if using sqlite3.
         'USER': 'makyo',                      # Not used with sqlite3.
         'PASSWORD': 'Gaf%fs43',                  # Not used with sqlite3.
-        'HOST': 'mysql.mjs-svc.com',                      # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
@@ -40,6 +40,7 @@ SITE_ID = 1
 STATIC_URL = "http://c.o-f.co"
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = "/accounts/profile/"
+CSRF_COOKIE_NAME = "XSRF-TOKEN"
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -51,7 +52,7 @@ USE_L10N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '/home/makyo/characters.openfurry.org/public/media/'
+MEDIA_ROOT = '/var/webapps/characters.openfurry.org/charref/public/media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -89,6 +90,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
 )
 
 ROOT_URLCONF = 'charref.urls'
@@ -97,7 +99,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/makyo/characters.openfurry.org/charref/templates'
+    '/var/webapps/characters.openfurry.org/charref/templates'
 )
 
 INSTALLED_APPS = (
@@ -108,7 +110,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'django.contrib.flatpages',
     'charref.characters',
     'charref.gallery',
     'charref.activitystream',
+    'charref.usermgmt',
 )

@@ -1,8 +1,9 @@
-{% extends "base.html" %}
+{% extends "base-backbone.html" %}
 
 {% block head %}
 <link rev="canonical" type="text/html" href="http://c.o-f.co/m/{{ morph.id }}" />
 <script type="text/javascript">
+    window.__route = 'morph/{{ morph.id }}';
     $(function () {
         $('#imageBay').dialog({ 
             autoOpen: false,
@@ -12,7 +13,7 @@
         });
         $('#createDescription').dialog({ 
             autoOpen: false,
-            width: 550,
+            width: 600,
             height: 400,
             modal: true
         });
@@ -33,17 +34,17 @@
         <p><strong>Morph species category:</strong> {{ morph.species_category }}</p>
         <p><strong>Morph owner:</strong> <a href="/~{{ morph.user.username }}">{{ morph.user.username }}</a></p>
         {% if morph.user == user %}
-        <p><a href="{{ morph.get_absolute_url }}/edit">Edit this morph</a></p>
-        <p><a href="javascript:void(0)" onclick="$('#imageBay').dialog('open');">Attach image</a></p>
+        <p class="addLink"><a href="{{ morph.get_absolute_url }}/edit">Edit this morph</a></p>
+        <p class="addLink"><a href="javascript:void(0)" onclick="$('#imageBay').dialog('open');">Attach image</a></p>
         {% endif %}
-        <div class="astream">
+        <!--<div class="astream">
             <h3>Activity stream</h3>
             <ul>
                 {% for si in morph.stream_items.all %}
                 <li class="{% cycle "odd" "even" %}" title="{{ si.action_time|date:"DATETIME_FORMAT" }}"><a href="/~{{ si.user.username }}">~{{ si.user.username }}</a> {{ si.get_action_type_display }} {{ morph.gender }} {{ morph.species_text }} (morph)</li>
                 {% endfor %}
             </ul>
-        </div>
+        </div>-->
         <div class="small">Permalink: <a href="http://c.o-f.co/m/{{ morph.id }}">http://c.o-f.co/m/{{ morph.id }}</a></div>
     </div>
     <div class="wrapper">
@@ -56,7 +57,7 @@
         {% endfor %}
         {% if user == morph.user %}
             <hr />
-            <a href="javascript:void(0)" onclick="$('#createDescription').dialog('open')">+ Add description</a>
+            <p class="addLink"><a href="javascript:void(0)" onclick="$('#createDescription').dialog('open')">+ Add description</a></p>
             <div id="createDescription" title="Create description">
                 <form method="post" action="/description/create/">
                     {% csrf_token %}
@@ -68,7 +69,7 @@
                         </tr>
                         <tr>
                             <th><label for="description">Description:</label></th>
-                            <td><textarea rows="10" cols="60" name="description"></textarea></td>
+                            <td><textarea rows="10" cols="50" name="description"></textarea></td>
                         </tr>
                         <tr>
                             <th><label for="rating">Rating:</label></th>
@@ -106,20 +107,4 @@
         {% endfor %}
     </div>
 </div>
-{% if morph.user == user %}
-<div id="imageBay" title="Attach an image">
-    {% for image in user.image_set.all %}
-    <form method="post" action="/image/{{ image.id }}/attach/">
-        {% csrf_token %}
-        <input type="hidden" name="content_type" value="{{ morph.get_content_type.id }}" />
-        <input type="hidden" name="object_id" value=" {{ morph.id }}" />
-        <p><input type="image" src="/media/{{ image.thumbnail }}" alt="Attach image" /></p>
-        <p><strong>Caption:</strong> <input type="text" name="caption" /></p>
-    </form>
-    {% if not forloop.last %}
-    <hr />
-    {% endif %}
-    {% endfor %}
-</div>
-{% endif %}
 {% endblock %}

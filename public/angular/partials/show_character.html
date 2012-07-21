@@ -1,0 +1,99 @@
+<div id="twoway">
+    <div class="wrapper">
+        <h3>Stats</h3>
+        <p><strong>Character name:</strong> {{character.fields.name}}</p>
+        <p><strong>Character owner:</strong> <a href="#/~{{character.fields.user}}">~{{character.fields.user}}</a></p>
+        <ng:switch on="character.is_owner"><div ng:switch-when="true">
+            <p class="addLink"><a href="/character/{{character.fields.id}}/edit">Edit this character</a></p>
+            <p class="addLink"><a href="javascript:void(0)" onclick="$('#imageBay').dialog(ibDialogOptions);">Attach image</a></p>
+        </div></ng:switch>
+        <p class="small">Permalink: <a href="http://c.o-f.co/c/{{character.fields.id}}">http://c.o-f.co/c/{{character.fields.id}}</a></p>
+    </div>
+    <div class="wrapper">
+        <h3>Morphs</h3>
+        <p ng:repeat="morph in character.morphs"><a href="#/morph/{{morph.id}}">{{morph.name}}</a><ng:switch on="character.is_owner"><span ng:switch-when="true"> - <a href="/morph/{{morph.id}}/delete">[X]</a></span></ng:switch></p>
+        <ng:switch on="character.is_owner"><div ng:switch-when="true">
+            <hr />
+            <p class="addLink"><a href="javascript:void(0)" onclick="$('#createMorph').dialog('open')">+ Add morph</a></p>
+            <div id="createMorph" title="Create morph">
+                <form method="post" action="/morph/create/">
+                    <div class="ntn"></div>
+                    <input id="charidfld" type="hidden" name="character" value="{{character.fields.id}}" />
+                    <table>
+                        <tr>
+                            <th><label for="gender">Gender:</label></th>
+                            <td>
+                                <select id="gender-preselect">
+                                    <option value="">-- Select --</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Herm">Herm</option>
+                                    <option value="Other">Other...</option>
+                                </select>
+                                <input type="text" id="gender" name="gender" style="display: none" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th><label class="tipsify" title="This is just a generic category used for organization; feel free to specify whatever you want in 'species text'!" for="species_category">Species category</label></th>
+                            <td id="sc"></td>
+                        </tr>
+                        <tr>
+                            <th><label for="species_text">Species:</label></th>
+                            <td><input type="text" name="species_text" /></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="submit" value="Create morph" /></td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div></ng:switch>
+    </div>
+    <div style="clear: left">
+        <h3>Images</h3>
+        <div ng:repeat="image in character.images" class="wrapper galleryThumb" style="height: 200px;">
+            <a href="#/image/{{image.image_id}}"><img class="thumb{{image.rating}}" ng:src="{{image.thumbnail}}" alt="{{image.attribution}}" /></a><br />
+            {{image.caption}}
+            <ng:switch on="character.is_owner"><a ng:switch-when="true" href="/image/{{image.id}}/detach/">[X]</a></ng:switch>
+        </div>
+    </div>
+</div>
+<ng:switch on="character.is_owner"><div ng:switch-when="true">
+    <div id="imageBay" title="Attach an image" style="display: none">
+        <div ng:repeat="image in images">
+            <form method="post" action="/image/{{image.pk}}/attach/">
+                <div class="ntn"></div>
+                <input type="hidden" name="content_type" value="{{character.content_type_id}}" />
+                <input type="hidden" name="object_id" value="{{character.fields.id}}" />
+                <p><input type="image" ng:src="/media/{{image.fields.thumbnail}}" alt="Attach image" /></p>
+                <p><strong>Caption:</strong> <input type="text" name="caption" /></p>
+                <hr />
+            </form>
+        </div>
+    </div>
+</div></ng:switch>
+<script type="text/javascript">
+    var ibDialogOptions = { 
+        width: 300,
+        height: 400,
+        modal: true
+    };
+    $(document).ready(function() {
+        $('.ntn').append($('#nnt').html());
+        $('#createMorph').dialog({ 
+            autoOpen: false,
+            width: 400,
+            height: 250,
+            modal: true
+        });
+        $('#gender-preselect').change(function(event) {
+            var preselect = this;
+            $('#gender').val($(preselect).val());
+            if ($(preselect).val() == "Other") {
+                $('#gender').show();
+            } else {
+                $('#gender').hide();
+            }
+        });
+    });
+</script>
