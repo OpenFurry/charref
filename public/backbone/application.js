@@ -227,6 +227,9 @@
         },
 
         'render': function() {
+            // Destroy previous dialogs
+            $('#createMorph').dialog('destroy');
+            $('#createMorph').remove();
             var result = Handlebars.templates.showCharacter(this.model.toJSON());
             $('#content').html(result);
             $('#sc').load("/_species/");
@@ -254,6 +257,9 @@
         },
 
         'render': function() {
+            // Destroy previous dialogs
+            $('#createDescription').dialog('destroy');
+            $('#createDescription').remove();
             var result = Handlebars.templates.showMorph(this.model.toJSON());
             $('#content').html(result);
             App.imagesForItemModel.set({
