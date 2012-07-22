@@ -17,13 +17,13 @@
             <p>
                 <a class="push" href="/description/{{this.id}}">{{this.name}}</a>
                 {{#if ../is_owner}}
-                    <a href="/description/{{this.id}}/delete">[X]</a>
+                    <a href="/description/{{this.id}}/delete"><img src="http://lib.jnsq.us/iconset/12x12/remove.png" class="icon" alt="Remove" /></a>
                 {{/if}}
             </p>
         {{/each}}
         <hr />
         {{#if is_owner}}
-            <p class="addLink"><a href="javascript:void(0)" onclick="$('#createDescription').dialog('open')">+ Add description</a></p>
+            <p class="addLink"><a href="javascript:void(0)" onclick="$('#createDescription').dialog('open')"><img src="http://lib.jnsq.us/iconset/12x12/add.png" class="icon" /> Add description</a></p>
             <div id="createDescription" title="Create description">
                 <form method="post" action="/description/create/">
                     <div class="ntn"></div>

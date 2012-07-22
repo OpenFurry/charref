@@ -52,7 +52,7 @@ function program2(depth0,data) {
   stack1 = depth0.id;
   if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
   else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "this.id", { hash: {} }); }
-  buffer += escapeExpression(stack1) + "/detach/\">[X]</a>\n            ";
+  buffer += escapeExpression(stack1) + "/detach/\"><img src=\"http://lib.jnsq.us/iconset/12x12/remove.png\" class=\"icon\" alt=\"Detach\" /></a>\n            ";
   return buffer;}
 
   buffer += "<div style=\"clear: left\">\n    <h3>Images</h3>\n    ";
@@ -153,13 +153,13 @@ function program4(depth0,data) {
   stack1 = depth0.id;
   if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
   else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "this.id", { hash: {} }); }
-  buffer += escapeExpression(stack1) + "/delete\">[X]</a>\n                ";
+  buffer += escapeExpression(stack1) + "/delete\"><img src=\"http://lib.jnsq.us/iconset/12x12/remove.png\" class=\"icon\" alt=\"Remove\" /></a>\n                ";
   return buffer;}
 
 function program6(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\n            <p class=\"addLink\"><a href=\"javascript:void(0)\" onclick=\"$('#createMorph').dialog('open')\">+ Add morph</a></p>\n            <div id=\"createMorph\" title=\"Create morph\">\n                <form method=\"post\" action=\"/morph/create/\">\n                    <div class=\"ntn\"></div>\n                    <input id=\"charidfld\" type=\"hidden\" name=\"character\" value=\"";
+  buffer += "\n            <p class=\"addLink\"><a href=\"javascript:void(0)\" onclick=\"$('#createMorph').dialog('open')\"><img src=\"http://lib.jnsq.us/iconset/12x12/add.png\" class=\"icon\" /> Add morph</a></p>\n            <div id=\"createMorph\" title=\"Create morph\">\n                <form method=\"post\" action=\"/morph/create/\">\n                    <div class=\"ntn\"></div>\n                    <input id=\"charidfld\" type=\"hidden\" name=\"character\" value=\"";
   foundHelper = helpers.fields;
   stack1 = foundHelper || depth0.fields;
   stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.id);
@@ -544,13 +544,13 @@ function program4(depth0,data) {
   stack1 = depth0.id;
   if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
   else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "this.id", { hash: {} }); }
-  buffer += escapeExpression(stack1) + "/delete\">[X]</a>\n                ";
+  buffer += escapeExpression(stack1) + "/delete\"><img src=\"http://lib.jnsq.us/iconset/12x12/remove.png\" class=\"icon\" alt=\"Remove\" /></a>\n                ";
   return buffer;}
 
 function program6(depth0,data) {
   
   var buffer = "", stack1;
-  buffer += "\n            <p class=\"addLink\"><a href=\"javascript:void(0)\" onclick=\"$('#createDescription').dialog('open')\">+ Add description</a></p>\n            <div id=\"createDescription\" title=\"Create description\">\n                <form method=\"post\" action=\"/description/create/\">\n                    <div class=\"ntn\"></div>\n                    <input id=\"morphidfld\" type=\"hidden\" name=\"morph\" value=\"";
+  buffer += "\n            <p class=\"addLink\"><a href=\"javascript:void(0)\" onclick=\"$('#createDescription').dialog('open')\"><img src=\"http://lib.jnsq.us/iconset/12x12/add.png\" class=\"icon\" /> Add description</a></p>\n            <div id=\"createDescription\" title=\"Create description\">\n                <form method=\"post\" action=\"/description/create/\">\n                    <div class=\"ntn\"></div>\n                    <input id=\"morphidfld\" type=\"hidden\" name=\"morph\" value=\"";
   foundHelper = helpers.morph;
   stack1 = foundHelper || depth0.morph;
   stack1 = (stack1 === null || stack1 === undefined || stack1 === false ? stack1 : stack1.fields);
@@ -641,7 +641,7 @@ templates['showUser'] = template(function (Handlebars,depth0,helpers,partials,da
 function program1(depth0,data) {
   
   
-  return "\n                <span><a href=\"/image/create/\">+ Add image</a></span>\n            ";}
+  return "\n                <span><a href=\"/image/create/\"><img src=\"http://lib.jnsq.us/iconset/12x12/add.png\" class=\"icon\" /> Add image</a></span>\n            ";}
 
 function program3(depth0,data) {
   
@@ -685,13 +685,13 @@ function program6(depth0,data) {
   stack1 = depth0.id;
   if(typeof stack1 === functionType) { stack1 = stack1.call(depth0, { hash: {} }); }
   else if(stack1=== undef) { stack1 = helperMissing.call(depth0, "this.id", { hash: {} }); }
-  buffer += escapeExpression(stack1) + "/delete\">[X]</a>\n                ";
+  buffer += escapeExpression(stack1) + "/delete\"><img src=\"http://lib.jnsq.us/iconset/12x12/remove.png\" class=\"icon\" alt=\"Remove\" /></a>\n                ";
   return buffer;}
 
 function program8(depth0,data) {
   
   
-  return "\n            <p class=\"addLink\"><a href=\"javascript:void(0)\" onclick=\"$('#addCharacter').toggle()\">+ Add Character</a></p>\n            <form method=\"post\" action=\"/character/create/\" id=\"addCharacter\" style=\"display: none\">\n                <div class=\"ntn\"></div>\n                <table>\n                    <tr>\n                        <th><label for=\"name\">Character name:</label></th>\n                        <td><input type=\"text\" name=\"name\" /></td>\n                    </tr>\n                    <tr>\n                        <td colspan=\"2\"><input type=\"submit\" value=\"Create character\" /></td>\n                    </tr>\n                </table>\n            </form>\n        ";}
+  return "\n            <p class=\"addLink\"><a href=\"javascript:void(0)\" onclick=\"$('#addCharacter').toggle()\"><img src=\"http://lib.jnsq.us/iconset/12x12/add.png\" class=\"icon\" /> Add Character</a></p>\n            <form method=\"post\" action=\"/character/create/\" id=\"addCharacter\" style=\"display: none\">\n                <div class=\"ntn\"></div>\n                <table>\n                    <tr>\n                        <th><label for=\"name\">Character name:</label></th>\n                        <td><input type=\"text\" name=\"name\" /></td>\n                    </tr>\n                    <tr>\n                        <td colspan=\"2\"><input type=\"submit\" value=\"Create character\" /></td>\n                    </tr>\n                </table>\n            </form>\n        ";}
 
   buffer += "<div id=\"twoway\">\n    <div class=\"wrapper\">\n        <h3>Stats</h3>\n        <p><strong>Username:</strong> ";
   foundHelper = helpers.fields;

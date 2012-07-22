@@ -15,13 +15,13 @@
             <p>
                 <a class="push" href="/morph/{{this.id}}">{{this.name}}</a>
                 {{#if ../is_owner}}
-                    <a href="/morph/{{this.id}}/delete">[X]</a>
+                    <a href="/morph/{{this.id}}/delete"><img src="http://lib.jnsq.us/iconset/12x12/remove.png" class="icon" alt="Remove" /></a>
                 {{/if}}
             </p>
         {{/each}}
         <hr />
         {{#if is_owner}}
-            <p class="addLink"><a href="javascript:void(0)" onclick="$('#createMorph').dialog('open')">+ Add morph</a></p>
+            <p class="addLink"><a href="javascript:void(0)" onclick="$('#createMorph').dialog('open')"><img src="http://lib.jnsq.us/iconset/12x12/add.png" class="icon" /> Add morph</a></p>
             <div id="createMorph" title="Create morph">
                 <form method="post" action="/morph/create/">
                     <div class="ntn"></div>

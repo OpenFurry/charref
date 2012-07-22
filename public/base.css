@@ -120,6 +120,17 @@ h3 {
     text-decoration: underline;
 }
 
+.icon {
+    opacity: 0.75;
+    filter: alpha(opacity=75);
+    border: 0;
+}
+
+.icon:hover {
+    opacity: 1.0;
+    filter: alpha(opacity=100);
+}
+
 .thumbR, .descriptionR {
     opacity: 0.10;
     filter: alpha(opacity=10);

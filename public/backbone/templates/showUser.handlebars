@@ -10,7 +10,7 @@
         <p>
             <strong>Images:</strong> {{images}} (<a href="/~{{fields.username}}/images">list</a>)
             {{#if is_owner}}
-                <span><a href="/image/create/">+ Add image</a></span>
+                <span><a href="/image/create/"><img src="http://lib.jnsq.us/iconset/12x12/add.png" class="icon" /> Add image</a></span>
             {{/if}}
         </p>
         <p><strong>Locations (as owner):</strong> {{locations}}</p>
@@ -26,13 +26,13 @@
             <p>
                 <a class="push" href="/character/{{this.id}}">{{this.name}}</a>
                 {{#if ../is_owner}}
-                    <a href="/character/{{this.id}}/delete">[X]</a>
+                    <a href="/character/{{this.id}}/delete"><img src="http://lib.jnsq.us/iconset/12x12/remove.png" class="icon" alt="Remove" /></a>
                 {{/if}}
             </p>
         {{/each}}
         <hr/>
         {{#if is_owner}}
-            <p class="addLink"><a href="javascript:void(0)" onclick="$('#addCharacter').toggle()">+ Add Character</a></p>
+            <p class="addLink"><a href="javascript:void(0)" onclick="$('#addCharacter').toggle()"><img src="http://lib.jnsq.us/iconset/12x12/add.png" class="icon" /> Add Character</a></p>
             <form method="post" action="/character/create/" id="addCharacter" style="display: none">
                 <div class="ntn"></div>
                 <table>
