@@ -8,7 +8,7 @@ urlpatterns = patterns('charref.characters.views',
     (r'^ng/', 'ng'),
     (r'^app/', 'app'),
 
-    (r'^~(?P<username>[a-zA-Z0-9\-_ ]+)/$', 'show_user'),
+    (r'^~(?P<username>[a-zA-Z0-9\-_ ]+)/?$', 'show_user'),
     (r'^~(?P<username>[a-zA-Z0-9\-_ ]+)/edit/$', 'edit_user'),
     (r'^register/$', 'register'),
     (r'^users/$', 'list_users'),
