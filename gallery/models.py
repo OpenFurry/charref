@@ -1,3 +1,6 @@
+import os
+import time
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -11,7 +14,12 @@ class Image(models.Model):
             ('R', "Adult")
             )
 
-    image = models.ImageField(upload_to = 'gallery')
+    def image_path(instance, filename):
+        return os.path.join(
+            'gallery',
+            str(int(time.time())) + '-' + filename)
+
+    image = models.ImageField(upload_to = image_path)
     thumbnail = models.ImageField(upload_to = 'gallery/thumbs', blank = True)
     attribution = models.CharField(max_length = 200)
     rating = models.CharField(max_length = 1, choices = RATINGS)
