@@ -15,7 +15,8 @@ class Image(models.Model):
             )
 
     def image_path(instance, filename):
-        return os.path.join(
+        # Whyyyy is this applied twice.  ?.?
+        return filename if filename.startswith('gallery/') else os.path.join(
             'gallery',
             str(int(time.time())) + '-' + filename)
 

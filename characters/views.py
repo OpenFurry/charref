@@ -5,6 +5,7 @@ from django.core import serializers
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.messages import add_message
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_protect
 from charref.characters.models import *
@@ -91,7 +92,7 @@ def show_user(request, username):
 @login_required
 def edit_user(request, username):
     if (request.user.username != username):
-        request.user.message_set.create(message = '<div class="error">You may only edit yourself!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only edit yourself!</div>')
         return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
     form = UserForm(instance = request.user)
     if (request.method == 'POST'):
@@ -122,7 +123,7 @@ def register(request):
             si.save()
             return HttpResponseRedirect("/~%s" % user.username)
         else:
-            request.user.message_set.create(message = '<div class="failure">Oops!  All fields required!</div>')
+            messages.add_message(request, messages.WARNING, '<div class="failure">Oops!  All fields required!</div>')
     return render_to_response("registration/create_user.html", context_instance = RequestContext(request, {}))
 
 ##
@@ -183,7 +184,7 @@ def edit_character(request, character_id):
             si.save()
             return HttpResponseRedirect(c.get_absolute_url())
         else:
-            request.user.message_set.create(message = '<div class="error">You must enter a name!</div>')
+            messages.add_message(request, messages.ERROR, '<div class="error">You must enter a name!</div>')
     return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {'character': c}))
 
 @login_required
@@ -191,7 +192,7 @@ def delete_character(request, character_id):
     character = get_object_or_404(Character, id = character_id)
     if (request.user != character.user):
         #TODO StreamItem flagging user for attempting to delete a character not theirs
-        request.user.message_set.create(message = '<div class="error">You may only delete your own characters!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only delete your own characters!</div>')
         return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
     if (request.POST.get('confirm', None) is not None):
         for morph in character.morph_set.all():
@@ -225,7 +226,7 @@ def create_character(request):
         si.save()
         return HttpResponseRedirect(c.get_absolute_url())
     else:
-        request.user.message_set.create(message = '<div class="error">You must enter a name!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You must enter a name!</div>')
         return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {}))
 
 ##
@@ -268,7 +269,7 @@ def edit_morph(request, morph_id):
     form = MorphForm(instance = morph)
     if (request.user != morph.user):
         #TODO flag user
-        request.user.message_set.create(message = '<div class="error">You may only edit a morph that you own!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only edit a morph that you own!</div>')
         return HttpResponseRedirect(morph.get_absolute_url())
     if (request.method == "POST"):
         form = MorphForm(request.POST, instance = morph)
@@ -290,7 +291,7 @@ def delete_morph(request, morph_id):
     morph = Morph.objects.get(id = morph_id)
     if (request.user != morph.user):
         #TODO flag user
-        request.user.message_set.create(message = '<div class="error">You may only delete a morph that belongs to you!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only delete a morph that belongs to you!</div>')
         return render_to_response("permission_denied.html", context_instance = RequestContext(request))
     if (request.method == "POST" and request.POST.get("confirm", None) is not None):
         character = morph.character
@@ -324,7 +325,7 @@ def create_morph(request):
             morph = form.save(commit = False)
             if (request.user != morph.character.user):
                 #TODO flag user
-                request.user.message_set.create(message = '<div class="error">You may only create morphs for your characters!</div>')
+                messages.add_message(request, messages.ERROR, '<div class="error">You may only create morphs for your characters!</div>')
                 return render_to_response("permission_denied.html", context_instance = RequestContext(request, {}))
             morph.user = request.user
             morph.save()
@@ -398,7 +399,8 @@ def edit_description(request, description_id):
 def delete_description(request, description_id):
     description = get_object_or_404(Description, id = description_id)
     if (request.user != description.user):
-        request.user.message_set.create(message = '<div class="error">You may only delete descriptions that belong to you!</div>')
+        # TODO flag user
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only delete descriptions that belong to you!</div>')
         return render_to_response("permission_denied.html", context_instance = RequestContext(request, {}))
     if (request.method == "POST" and request.POST.get("confirm", None) is not None):
         morph = description.morph
@@ -427,7 +429,7 @@ def create_description(request):
             description = form.save(commit = False)
             if (request.user != description.morph.user):
                 #TODO flag user
-                request.user.message_set.create(message = '<div class="error">You may only create descriptions for your morphs!</div>')
+                messages.add_message(request, messages.ERROR, '<div class="error">You may only create descriptions for your morphs!</div>')
                 return render_to_response("permission_denied.html", context_instance = RequestContext(request, {}))
             description.user = request.user
             description.save()
@@ -480,7 +482,7 @@ def edit_location(request, location_id):
     location = get_object_or_404(Location, id = location_id)
     if (request.user != location.user):
         #TODO flag user
-        request.user.message_set.create(message = '<div class="error">You may only edit locations that you are the owner of!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only edit locations that you are the owner of!</div>')
         return render_to_response("permission_denied.html", context_instance = RequestContext(request, {}))
     form = LocationForm(instance = location)
     if (request.method == "POST"):
@@ -501,7 +503,7 @@ def delete_location(request, location_id):
     location = get_object_or_404(Location, id = location_id)
     if (request.user != location.user):
         #TODO flag user
-        request.user.message_set.create(message = '<div class="error">You may only delete locations that you are the owner of!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only delete locations that you are the owner of!</div>')
         return render_to_response("permission_denied.html", context_instance = RequestContext(request, {}))
     if (request.method == "POST"):
         location.delete()
@@ -537,15 +539,15 @@ def create_location(request):
 def attach_character_to_location(request, location_id):
     location = get_object_or_404(Location, id = location_id)
     if (request.GET.get('character_id', None) is None):
-        request.user.message_set.create(message = '<div class="error">Must attach a character to a location!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">Must attach a character to a location!</div>')
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     character = get_object_or_404(Character, id = request.GET['character_id'])
     if (request.user != character.user):
-        request.user.message_set.create(message = '<div class="error">You may only attach your own characters!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only attach your own characters!</div>')
         #TODO flag user
         return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
     if (CharacterLocation.objects.filter(character = character, location = location).count() > 0):
-        request.user.message_set.create(message = '<div class="warning">That character is already attached to this location!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="warning">That character is already attached to this location!</div>')
         return HttpResponseRedirect(location.get_absolute_url())
     cl = CharacterLocation(
             character = character,
@@ -564,7 +566,7 @@ def attach_character_to_location(request, location_id):
 def detach_character_from_location(request, characterlocation_id):
     cl = get_object_or_404(CharacterLocation, id = characterlocation_id)
     if (request.user != cl.character.user):
-        request.user.message_set.create(message = '<div class="error">You may only detach your own characters!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only detach your own characters!</div>')
         #TODO flag user
         return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
     location = cl.location

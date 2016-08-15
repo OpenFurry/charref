@@ -59,7 +59,7 @@ def edit_image(request, image_id):
     image = get_object_or_404(Image, id = image_id)
     form = ImageForm(instance = image)
     if (request.user != image.user):
-        request.user.message_set.create(message = '<div class="error">You may only edit images that belong to you!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only edit images that belong to you!</div>')
         return render_to_response('permission_denied.html', context_instnace = RequestContext(request, {}))
     if (request.method == "POST"):
         form = ImageForm(request.POST, request.FILES, instance = image)
@@ -71,7 +71,7 @@ def edit_image(request, image_id):
                     content_type = ContentType.objects.get_for_model(Image),
                     object_id = image_id)
             si.save()
-            request.user.message_set.create(message = '<div class="success">Image updated</div>')
+            messages.add_message(request, messages.SUCCESS, '<div class="success">Image updated</div>')
             return HttpResponseRedirect(image.get_absolute_url())
     return render_to_response('gallery/image/edit.html', context_instance = RequestContext(request, {'form': form}))
 
@@ -91,7 +91,7 @@ def create_image(request):
                     content_type = ContentType.objects.get_for_model(Image),
                     object_id = image.id)
             si.save()
-            request.user.message_set.create(message = '<div class="success">Image created - <a href="/image/create/">Add another!</a></div>')
+            messages.add_message(request, messages.SUCCESS, '<div class="success">Image created - <a href="/image/create/">Add another!</a></div>')
             return HttpResponseRedirect(image.get_absolute_url())
     return render_to_response('gallery/image/edit.html', context_instance = RequestContext(request, {'form': form}))
     
@@ -99,7 +99,7 @@ def create_image(request):
 def delete_image(request, image_id):
     image = get_object_or_404(Image, id = image_id)
     if (request.user != image.user):
-        request.user.message_set.create(message = '<div class="error">You may only delete images that belong to you!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only delete images that belong to you!</div>')
         return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
     if (request.method == "POST" and request.POST.get('confirm', None) is not None):
         for ia in image.attachments.all():
@@ -111,7 +111,7 @@ def delete_image(request, image_id):
                 content_type = ContentType.objects.get_for_model(Image),
                 object_id = image_id)
         si.save()
-        request.user.message_set.create(message = '<div class="success">Image deleted</div>')
+        messages.add_message(request, messages.SUCCESS, '<div class="success">Image deleted</div>')
         return HttpResponseRedirect('/~%s' % request.user.username)
     return render_to_response('gallery/image/delete.html', context_instance = RequestContext(request, {'image': image}))
 
@@ -119,31 +119,31 @@ def delete_image(request, image_id):
 def attach_image(request, image_id):
     image = get_object_or_404(Image, id = image_id)
     if (request.user != image.user):
-        request.user.message_set.create(message = '<div class="error">You may only attach your images to artifacts!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only attach your images to artifacts!</div>')
         return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
     form = ImageAttachmentForm(request.POST)
     if (not form.is_valid()):
-        request.user.message_set.create(message = '<div class="error">Something seems to have gone wrong with the attachment process.  Try again! %s</div>' % form.errors)
+        messages.add_message(request, messages.ERROR, '<div class="error">Something seems to have gone wrong with the attachment process.  Try again! %s</div>' % form.errors)
         return HttpResponseRedirect(request.META['HTTP_REFERER'])
     ia = form.save(commit = False)
     ia.image = image
     ia.save()
     form.save_m2m()
     if (request.user != ia.content_object.user):
-        request.user.message_set.create(message = '<div class="error">You may only attach your images to your own artifacts!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only attach your images to your own artifacts!</div>')
         return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
-    request.user.message_set.create(message = '<div class="success">Image attached</div>')
+    messages.add_message(request, messages.SUCCESS, '<div class="success">Image attached</div>')
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
 @login_required
 def detach_image(request, image_attachment_id):
     ia = get_object_or_404(ImageAttachment, id = image_attachment_id)
     if (request.user != ia.image.user):
-        request.user.message_set.create(message = '<div class="error">You may only detach your images!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only detach your images!</div>')
         return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
     if (request.user != ia.content_object.user):
-        request.user.message_set.create(message = '<div class="error">You may only detach images from your own artifacts!</div>')
+        messages.add_message(request, messages.ERROR, '<div class="error">You may only detach images from your own artifacts!</div>')
         return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
     ia.delete()
-    request.user.message_set.create(message = '<div class="success">Image detached</div>')
+    messages.add_message(request, messages.SUCCESS, '<div class="success">Image detached</div>')
     return HttpResponseRedirect(request.META['HTTP_REFERER'])

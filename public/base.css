@@ -20,6 +20,10 @@ body {
     font-family: 'Gentium Book Basic', serif;
 }
 
+body #descriptiontext {
+    text-indent: 1.5em;
+}
+
 #header h1 {
     /*font-family: 'Cabin', sans-serif;*/
 }
