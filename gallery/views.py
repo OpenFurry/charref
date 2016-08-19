@@ -5,6 +5,7 @@ from django.core import serializers
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib import messages
 from charref.gallery.models import *
 from charref.gallery.forms import *
 from charref.activitystream.models import *
