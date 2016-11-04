@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core import serializers
@@ -29,6 +29,6 @@ def remove_property(request, property_id):
     p = get_object_or_404(UserProperty, pk = property_id)
     if (p.user != request.user):
         messages.add_message(request, messages.ERROR, '<div class="error">You may only remove your own properties!</div>')
-        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
+        return render(request, 'permission_denied.html', {})
     p.delete()
     return HttpResponseRedirect(request.META['HTTP_REFERER'])

@@ -1,17 +1,17 @@
-{% extends "base-backbone.html" %}
+{% extends "base.html" %}
 
 {% block head %}
 <link rev="canonical" type="text/html" href="http://c.o-f.co/m/{{ morph.id }}" />
 <script type="text/javascript">
     window.__route = 'morph/{{ morph.id }}';
     $(function () {
-        $('#imageBay').dialog({ 
+        $('#imageBay').dialog({
             autoOpen: false,
             width: 300,
             height: 400,
             modal: true
         });
-        $('#createDescription').dialog({ 
+        $('#createDescription').dialog({
             autoOpen: false,
             width: 600,
             height: 400,

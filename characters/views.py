@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core import serializers
@@ -38,18 +38,7 @@ def front(request):
             }
         }), mimetype = "application/json")
     else:
-        return render_to_response('front.html', context_instance = RequestContext(request, {'counts': counts, 'new_user': new_user, 'random_morph': random_morph}))
-
-@csrf_protect
-def ng(request):
-    if (request.user.is_authenticated()):
-        if (UserProperty.objects.filter(user = request.user, key = "nong").count() > 0):
-             return HttpResponseRedirect('/')
-    return render_to_response('front-ng.html', context_instance = RequestContext(request, {}))
-
-@csrf_protect
-def app(request):
-    return render_to_response('front-backbone.html', context_instance = RequestContext(request, {}))
+        return render(request, 'front.html', {'counts': counts, 'new_user': new_user, 'random_morph': random_morph})
 
 def redirect_after_login(request):
     return HttpResponseRedirect('/~%s' % request.user.username)
@@ -71,7 +60,7 @@ def list_users(request):
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", [users]), mimetype = "application/json")
     else:
-        return render_to_response('characters/user/list.html', context_instance = RequestContext(request, {'users': users}))
+        return render(request, 'characters/user/list.html', {'users': users})
 
 def show_user(request, username):
     user = get_object_or_404(User, username = username)
@@ -87,13 +76,13 @@ def show_user(request, username):
             'is_owner': request.user == user
         }), mimetype = "application/json")
     else:
-        return render_to_response('characters/user/show.html', context_instance = RequestContext(request, {'user_object': user}))
+        return render(request, 'characters/user/show.html', {'user_object': user})
 
 @login_required
 def edit_user(request, username):
     if (request.user.username != username):
         messages.add_message(request, messages.ERROR, '<div class="error">You may only edit yourself!</div>')
-        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
+        return render(request, 'permission_denied.html', {})
     form = UserForm(instance = request.user)
     if (request.method == 'POST'):
         form = UserForm(request.POST, instance = request.user)
@@ -106,7 +95,7 @@ def edit_user(request, username):
                     object_id = request.user.id)
             si.save()
             return HttpResponseRedirect("/~%s" % request.user.username)
-    return render_to_response("characters/user/edit.html", context_instance = RequestContext(request, {'form': form, 'user_object': request.user}))
+    return render(request, "characters/user/edit.html", {'form': form, 'user_object': request.user})
 
 def register(request):
     if request.method == 'POST':
@@ -124,7 +113,7 @@ def register(request):
             return HttpResponseRedirect("/~%s" % user.username)
         else:
             messages.add_message(request, messages.WARNING, '<div class="failure">Oops!  All fields required!</div>')
-    return render_to_response("registration/create_user.html", context_instance = RequestContext(request, {}))
+    return render(request, "registration/create_user.html", {})
 
 ##
 
@@ -145,7 +134,7 @@ def list_characters(request):
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", characters), mimetype = "application/json")
     else:
-        return render_to_response('characters/character/list.html', context_instance = RequestContext(request, {'characters': characters}))
+        return render(request, 'characters/character/list.html', {'characters': characters})
 
 def list_characters_for_user(request, username):
     characters = Character.objects.filter(user__username__exact = username)
@@ -153,7 +142,7 @@ def list_characters_for_user(request, username):
         return HttpResponse(serializers.serialize("json", characters), mimetype = "application/json")
     else:
         # Shouldn't ever really happen, this is mostly here for AJAX requests
-        return render_to_response('characters/character/list.html', context_instance = RequestContext(request, {'characters': characters}))
+        return render(request, 'characters/character/list.html', {'characters': characters})
 
 def show_character(request, character_id):
     character = get_object_or_404(Character, id = character_id)
@@ -167,7 +156,7 @@ def show_character(request, character_id):
             'content_type_id': character.get_content_type().id
         }), mimetype = "application/json")
     else:
-        return render_to_response('characters/character/show.html', context_instance = RequestContext(request, {'character': character, 'species_select': _species_select_dropdown()}))
+        return render(request, 'characters/character/show.html', {'character': character, 'species_select': _species_select_dropdown()})
 
 @login_required
 def edit_character(request, character_id):
@@ -185,7 +174,7 @@ def edit_character(request, character_id):
             return HttpResponseRedirect(c.get_absolute_url())
         else:
             messages.add_message(request, messages.ERROR, '<div class="error">You must enter a name!</div>')
-    return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {'character': c}))
+    return render(request, 'characters/character/edit.html', {'character': c})
 
 @login_required
 def delete_character(request, character_id):
@@ -193,7 +182,7 @@ def delete_character(request, character_id):
     if (request.user != character.user):
         #TODO StreamItem flagging user for attempting to delete a character not theirs
         messages.add_message(request, messages.ERROR, '<div class="error">You may only delete your own characters!</div>')
-        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
+        return render(request, 'permission_denied.html', {})
     if (request.POST.get('confirm', None) is not None):
         for morph in character.morph_set.all():
             for description in morph.description_set.all():
@@ -208,12 +197,12 @@ def delete_character(request, character_id):
         si.save()
         return HttpResponseRedirect("/~%s" % request.user.username)
     else:
-        return render_to_response('characters/character/delete.html', context_instance = RequestContext(request, {'character': character}))
+        return render(request, 'characters/character/delete.html', {'character': character})
 
 @login_required
 def create_character(request):
     if (request.method == "GET"):
-        return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {}))
+        return render(request, 'characters/character/edit.html', {})
     if (request.POST.get('name', None) is not None):
         c = Character(name = request.POST['name'])
         c.user = request.user
@@ -227,7 +216,7 @@ def create_character(request):
         return HttpResponseRedirect(c.get_absolute_url())
     else:
         messages.add_message(request, messages.ERROR, '<div class="error">You must enter a name!</div>')
-        return render_to_response('characters/character/edit.html', context_instance = RequestContext(request, {}))
+        return render(request, 'characters/character/edit.html', {})
 
 ##
 
@@ -236,7 +225,7 @@ def list_morphs_for_character(request, character_id):
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", morphs), mimetype = "application/json")
     else:
-        return render_to_response('morphs/morph/list.html', context_instance = RequestContext(request, {}))
+        return render(request, 'morphs/morph/list.html', {})
 
 def show_morph(request, morph_id):
     morph = get_object_or_404(Morph, id = morph_id)
@@ -261,7 +250,7 @@ def show_morph(request, morph_id):
             'content_type_id': morph.get_content_type().id
         }), mimetype = "application/json")
     else:
-        return render_to_response('characters/morph/show.html', context_instance = RequestContext(request,  {'morph': morph}))
+        return render(request, 'characters/morph/show.html', {'morph': morph})
 
 @login_required
 def edit_morph(request, morph_id):
@@ -284,7 +273,7 @@ def edit_morph(request, morph_id):
             ajax_list_species(request)
             ajax_list_genders(request)
             return HttpResponseRedirect(morph.get_absolute_url())
-    return render_to_response('characters/morph/edit.html', context_instance = RequestContext(request, {'form': form, 'species_category': _species_select_dropdown(morph.species_category.id)}))
+    return render(request, 'characters/morph/edit.html', {'form': form, 'species_category': _species_select_dropdown(morph.species_category.id)})
 
 @login_required
 def delete_morph(request, morph_id):
@@ -292,7 +281,7 @@ def delete_morph(request, morph_id):
     if (request.user != morph.user):
         #TODO flag user
         messages.add_message(request, messages.ERROR, '<div class="error">You may only delete a morph that belongs to you!</div>')
-        return render_to_response("permission_denied.html", context_instance = RequestContext(request))
+        return render(request, "permission_denied.html", {})
     if (request.method == "POST" and request.POST.get("confirm", None) is not None):
         character = morph.character
         for description in morph.description_set.all():
@@ -314,7 +303,7 @@ def delete_morph(request, morph_id):
         ajax_list_genders(request)
         return HttpResponseRedirect(character.get_absolute_url())
     else:
-        return render_to_response('characters/morph/delete.html', context_instance = RequestContext(request, {'morph': morph}))
+        return render(request, 'characters/morph/delete.html', {'morph': morph})
 
 @login_required
 def create_morph(request):
@@ -326,7 +315,7 @@ def create_morph(request):
             if (request.user != morph.character.user):
                 #TODO flag user
                 messages.add_message(request, messages.ERROR, '<div class="error">You may only create morphs for your characters!</div>')
-                return render_to_response("permission_denied.html", context_instance = RequestContext(request, {}))
+                return render(request, "permission_denied.html", {})
             morph.user = request.user
             morph.save()
             form.save_m2m()
@@ -345,7 +334,7 @@ def create_morph(request):
             ajax_list_species(request)
             ajax_list_genders(request)
             return HttpResponseRedirect(morph.get_absolute_url())
-    return render_to_response('characters/morph/edit.html', context_instance = RequestContext(request, {'form': form, 'species_category':  _species_select_dropdown()}))
+    return render(request, 'characters/morph/edit.html', {'form': form, 'species_category':  _species_select_dropdown()})
 
 ##
 
@@ -354,7 +343,7 @@ def list_descriptions_for_morph(request, morph_id):
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", description), mimetype = "application/json")
     else:
-        return render_to_response("characters/descriptions/list.html", context_instance = RequestContext(request, {"description": description}))
+        return render(request, "characters/descriptions/list.html", {"description": description})
 
 def show_description(request, description_id):
     description = get_object_or_404(Description, id = description_id)
@@ -376,7 +365,7 @@ def show_description(request, description_id):
             'content_type_id': description.get_content_type().id
         }), mimetype = "application/json")
     else:
-        return render_to_response('characters/description/show.html', context_instance = RequestContext(request, {'description': description}))
+        return render(request, 'characters/description/show.html', {'description': description})
 
 @login_required
 def edit_description(request, description_id):
@@ -393,7 +382,7 @@ def edit_description(request, description_id):
                     object_id = description_id)
             si.save()
             return HttpResponseRedirect(description.get_absolute_url())
-    return render_to_response('characters/description/edit.html', context_instance = RequestContext(request, {'form': form}))
+    return render(request, 'characters/description/edit.html', {'form': form})
 
 @login_required
 def delete_description(request, description_id):
@@ -401,7 +390,7 @@ def delete_description(request, description_id):
     if (request.user != description.user):
         # TODO flag user
         messages.add_message(request, messages.ERROR, '<div class="error">You may only delete descriptions that belong to you!</div>')
-        return render_to_response("permission_denied.html", context_instance = RequestContext(request, {}))
+        return render(request, "permission_denied.html", {})
     if (request.method == "POST" and request.POST.get("confirm", None) is not None):
         morph = description.morph
         description.delete()
@@ -418,7 +407,7 @@ def delete_description(request, description_id):
                 object_id = morph.id)
         si.save()
         return HttpResponseRedirect(morph.get_absolute_url())
-    return render_to_response("characters/description/delete.html", context_instance = RequestContext(request, {'description': description}))
+    return render(request, "characters/description/delete.html", {'description': description})
 
 @login_required
 def create_description(request):
@@ -430,7 +419,7 @@ def create_description(request):
             if (request.user != description.morph.user):
                 #TODO flag user
                 messages.add_message(request, messages.ERROR, '<div class="error">You may only create descriptions for your morphs!</div>')
-                return render_to_response("permission_denied.html", context_instance = RequestContext(request, {}))
+                return render(request, "permission_denied.html", {})
             description.user = request.user
             description.save()
             form.save_m2m()
@@ -447,7 +436,7 @@ def create_description(request):
                     object_id = description.morph.id)
             si.save()
             return HttpResponseRedirect(description.get_absolute_url())
-    return render_to_response("characters/description/edit.html", context_instance = RequestContext(request, {'form': form}))
+    return render(request, "characters/description/edit.html", {'form': form})
 
 ##
 
@@ -468,14 +457,14 @@ def list_locations(request):
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", locations), mimetype = "application/json")
     else:
-        return render_to_response('characters/location/list.html', context_instance = RequestContext(request, {'locations': locations}))
+        return render(request, 'characters/location/list.html', {'locations': locations})
 
 def show_location(request, location_id):
     location = get_object_or_404(Location, id = location_id)
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", (location,)), mimetype = "application/json")
     else:
-        return render_to_response('characters/location/show.html', context_instance = RequestContext(request, {'location': location}))
+        return render(request, 'characters/location/show.html', {'location': location})
 
 @login_required
 def edit_location(request, location_id):
@@ -483,7 +472,7 @@ def edit_location(request, location_id):
     if (request.user != location.user):
         #TODO flag user
         messages.add_message(request, messages.ERROR, '<div class="error">You may only edit locations that you are the owner of!</div>')
-        return render_to_response("permission_denied.html", context_instance = RequestContext(request, {}))
+        return render(request, "permission_denied.html", {})
     form = LocationForm(instance = location)
     if (request.method == "POST"):
         form = LocationForm(request.POST, instance = location)
@@ -496,7 +485,7 @@ def edit_location(request, location_id):
                     object_id = character_id)
             si.save()
             return HttpResponseRedirect(location.get_absolute_url())
-    return render_to_response('characters/location/edit.html', context_instance = RequestContext(request, {'form': form}))
+    return render(request, 'characters/location/edit.html', {'form': form})
 
 @login_required
 def delete_location(request, location_id):
@@ -504,7 +493,7 @@ def delete_location(request, location_id):
     if (request.user != location.user):
         #TODO flag user
         messages.add_message(request, messages.ERROR, '<div class="error">You may only delete locations that you are the owner of!</div>')
-        return render_to_response("permission_denied.html", context_instance = RequestContext(request, {}))
+        return render(request, "permission_denied.html", {})
     if (request.method == "POST"):
         location.delete()
         si = StreamItem(
@@ -514,7 +503,7 @@ def delete_location(request, location_id):
                 object_id = location_id)
         si.save()
         return HttpResponseRedirect('/')
-    return render_to_response("characters/location/delete,html", context_instance = RequestContext(request, {}))
+    return render(request, "characters/location/delete,html", {})
 
 @login_required
 def create_location(request):
@@ -533,7 +522,7 @@ def create_location(request):
                     object_id = location.id)
             si.save()
             return HttpResponseRedirect(location.get_absolute_url())
-    return render_to_response("characters/location/edit.html", context_instance = RequestContext(request, {'form': form}))
+    return render(request, "characters/location/edit.html", {'form': form})
 
 @login_required
 def attach_character_to_location(request, location_id):
@@ -545,7 +534,7 @@ def attach_character_to_location(request, location_id):
     if (request.user != character.user):
         messages.add_message(request, messages.ERROR, '<div class="error">You may only attach your own characters!</div>')
         #TODO flag user
-        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
+        return render(request, 'permission_denied.html', {})
     if (CharacterLocation.objects.filter(character = character, location = location).count() > 0):
         messages.add_message(request, messages.ERROR, '<div class="warning">That character is already attached to this location!</div>')
         return HttpResponseRedirect(location.get_absolute_url())
@@ -568,7 +557,7 @@ def detach_character_from_location(request, characterlocation_id):
     if (request.user != cl.character.user):
         messages.add_message(request, messages.ERROR, '<div class="error">You may only detach your own characters!</div>')
         #TODO flag user
-        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
+        return render(request, 'permission_denied.html', {})
     location = cl.location
     cl.delete()
     si = StreamItem(
@@ -583,11 +572,11 @@ def detach_character_from_location(request, characterlocation_id):
 
 def list_species(request):
     species = SpeciesCategory.objects.filter(parent__isnull = True)
-    return render_to_response("characters/species/list.html", context_instance = RequestContext(request, {'species': species}))
+    return render(request, "characters/species/list.html", {'species': species})
 
 def show_species(request, species_id):
     species = get_object_or_404(SpeciesCategory, id = species_id)
-    return render_to_response("characters/species/show.html", context_instance = RequestContext(request, {'species': species}))
+    return render(request, "characters/species/show.html", {'species': species})
 
 ##
 

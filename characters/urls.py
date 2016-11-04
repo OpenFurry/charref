@@ -4,8 +4,6 @@ from .views import *
 
 urlpatterns = [
     url('^$', front),
-    url('^ng/', ng),
-    url('^app/', app),
 
     url('^accounts/profile/$', redirect_after_login),
     url('^accounts/create/$', register),

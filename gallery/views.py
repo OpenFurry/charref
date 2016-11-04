@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, render_to_response
+from django.shortcuts import get_object_or_404, render
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core import serializers
@@ -28,14 +28,14 @@ def show_image(request, image_id):
             'is_owner': request.user == image.user
         }), mimetype = "application/json")
     else:
-        return render_to_response('gallery/image/show.html', context_instance = RequestContext(request, {'image': image}))
+        return render(request, 'gallery/image/show.html', {'image': image})
 
 def list_images_for_user(request, username):
     user = get_object_or_404(User, username = username)
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", user.image_set.all()), mimetype = "application/json")
     else:
-        return render_to_response('gallery/image/list.html', context_instance = RequestContext(request, {'user_object': user}))
+        return render(request, 'gallery/image/list.html', {'user_object': user})
 
 def list_images_for_current_user(request):
     user = request.user
@@ -43,7 +43,7 @@ def list_images_for_current_user(request):
         if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
             return HttpResponse(serializers.serialize("json", user.image_set.all()), mimetype = "application/json")
         else:
-            return render_to_response('gallery/image/list.html', context_instance = RequestContext(request, {'user_object': user}))
+            return render(request, 'gallery/image/list.html', {'user_object': user})
     else:
         return HttpResponse('[]', mimetype = "application/json")
 
@@ -53,7 +53,7 @@ def list_images_attached_to_object(request, app_name, model, object_id):
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         return HttpResponse(serializers.serialize("json", images), mimetype = "application/json")
     else:
-        return render_to_response('gallery/image/list.html', context_instance = RequestContext(Request, {'images': image}))
+        return render(request, 'gallery/image/list.html', {'images': image})
 
 @login_required
 def edit_image(request, image_id):
@@ -61,7 +61,7 @@ def edit_image(request, image_id):
     form = ImageForm(instance = image)
     if (request.user != image.user):
         messages.add_message(request, messages.ERROR, '<div class="error">You may only edit images that belong to you!</div>')
-        return render_to_response('permission_denied.html', context_instnace = RequestContext(request, {}))
+        return render(request, 'permission_denied.html', {})
     if (request.method == "POST"):
         form = ImageForm(request.POST, request.FILES, instance = image)
         if (form.is_valid()):
@@ -74,7 +74,7 @@ def edit_image(request, image_id):
             si.save()
             messages.add_message(request, messages.SUCCESS, '<div class="success">Image updated</div>')
             return HttpResponseRedirect(image.get_absolute_url())
-    return render_to_response('gallery/image/edit.html', context_instance = RequestContext(request, {'form': form}))
+    return render(request, 'gallery/image/edit.html', {'form': form})
 
 @login_required
 def create_image(request):
@@ -94,14 +94,14 @@ def create_image(request):
             si.save()
             messages.add_message(request, messages.SUCCESS, '<div class="success">Image created - <a href="/image/create/">Add another!</a></div>')
             return HttpResponseRedirect(image.get_absolute_url())
-    return render_to_response('gallery/image/edit.html', context_instance = RequestContext(request, {'form': form}))
+    return render(request, 'gallery/image/edit.html', {'form': form})
 
 @login_required
 def delete_image(request, image_id):
     image = get_object_or_404(Image, id = image_id)
     if (request.user != image.user):
         messages.add_message(request, messages.ERROR, '<div class="error">You may only delete images that belong to you!</div>')
-        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
+        return render(request, 'permission_denied.html', {})
     if (request.method == "POST" and request.POST.get('confirm', None) is not None):
         for ia in image.attachments.all():
             ia.delete()
@@ -114,14 +114,14 @@ def delete_image(request, image_id):
         si.save()
         messages.add_message(request, messages.SUCCESS, '<div class="success">Image deleted</div>')
         return HttpResponseRedirect('/~%s' % request.user.username)
-    return render_to_response('gallery/image/delete.html', context_instance = RequestContext(request, {'image': image}))
+    return render(request, 'gallery/image/delete.html', {'image': image})
 
 @login_required
 def attach_image(request, image_id):
     image = get_object_or_404(Image, id = image_id)
     if (request.user != image.user):
         messages.add_message(request, messages.ERROR, '<div class="error">You may only attach your images to artifacts!</div>')
-        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
+        return render(request, 'permission_denied.html', {})
     form = ImageAttachmentForm(request.POST)
     if (not form.is_valid()):
         messages.add_message(request, messages.ERROR, '<div class="error">Something seems to have gone wrong with the attachment process.  Try again! %s</div>' % form.errors)
@@ -132,7 +132,7 @@ def attach_image(request, image_id):
     form.save_m2m()
     if (request.user != ia.content_object.user):
         messages.add_message(request, messages.ERROR, '<div class="error">You may only attach your images to your own artifacts!</div>')
-        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
+        return render(request, 'permission_denied.html', {})
     messages.add_message(request, messages.SUCCESS, '<div class="success">Image attached</div>')
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
 
@@ -141,10 +141,10 @@ def detach_image(request, image_attachment_id):
     ia = get_object_or_404(ImageAttachment, id = image_attachment_id)
     if (request.user != ia.image.user):
         messages.add_message(request, messages.ERROR, '<div class="error">You may only detach your images!</div>')
-        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
+        return render(request, 'permission_denied.html', {})
     if (request.user != ia.content_object.user):
         messages.add_message(request, messages.ERROR, '<div class="error">You may only detach images from your own artifacts!</div>')
-        return render_to_response('permission_denied.html', context_instance = RequestContext(request, {}))
+        return render(request, 'permission_denied.html', {})
     ia.delete()
     messages.add_message(request, messages.SUCCESS, '<div class="success">Image detached</div>')
     return HttpResponseRedirect(request.META['HTTP_REFERER'])

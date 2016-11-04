@@ -89,10 +89,9 @@ body #descriptiontext {
     position:relative;
 }
 
-#footer .jnsq {
+#footer img {
     vertical-align: middle;
-    height: 40pt;
-    margin-top: 2px;
+    height: 14pt;
 }
 
 th {

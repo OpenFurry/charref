@@ -10,18 +10,18 @@ from django.contrib.contenttypes.fields import (
 )
 from activitystream.models import StreamItem
 
+def image_path(instance, filename):
+    # Whyyyy is this applied twice.  ?.?
+    return filename if filename.startswith('gallery/') else os.path.join(
+    'gallery',
+    str(int(time.time())) + '-' + filename)
+
 class Image(models.Model):
     RATINGS  = (
             ('G', "General"),
             ('M', "Mature"),
             ('R', "Adult")
             )
-
-    def image_path(instance, filename):
-        # Whyyyy is this applied twice.  ?.?
-        return filename if filename.startswith('gallery/') else os.path.join(
-            'gallery',
-            str(int(time.time())) + '-' + filename)
 
     image = models.ImageField(upload_to = image_path)
     thumbnail = models.ImageField(upload_to = 'gallery/thumbs', blank = True)

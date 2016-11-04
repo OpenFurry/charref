@@ -1,3 +1,5 @@
+{% load static %}
+
 <html>
     <head>
         <title>{% block title %}{% endblock %}Characters @ OpenFurry</title>
@@ -8,21 +10,20 @@
         <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
         <link href='https://fonts.googleapis.com/css?family=Gentium+Book+Basic|Cabin' rel='stylesheet' type='text/css'>
-        <link rel="stylesheet" type="text/css" href="/GGS.css" />
-        <link rel="stylesheet" type="text/css" href="/base.css" />
-        <link rel="stylesheet" type="text/css" href="/ui/css/custom-theme/jquery-ui-1.8.16.custom.css" />
-        <link rel="stylesheet" type="text/css" href="/tipsy/stylesheets/tipsy.css" />
+        <link rel="stylesheet" type="text/css" href="{% static '/GGS.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static '/base.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static '/ui/css/custom-theme/jquery-ui-1.8.16.custom.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static '/tipsy/stylesheets/tipsy.css' %}" />
         <link rel="shortcut icon" href="/favicon.ico" />
-        <script type="text/javascript" src="/jquery-1.7.2.js"></script>
-        <script type="text/javascript" src="/spin.js"></script>
-        <script type="text/javascript" src="/tipsy.js"></script>
-        <script type="text/javascript" src="/ui/js/jquery-ui-1.8.16.custom.min.js"></script>
+        <script type="text/javascript" src="{% static '/jquery-1.7.2.js' %}"></script>
+        <script type="text/javascript" src="{% static '/spin.js' %}"></script>
+        <script type="text/javascript" src="{% static '/tipsy.js' %}"></script>
+        <script type="text/javascript" src="{% static '/ui/js/jquery-ui-1.8.16.custom.min.js' %}"></script>
         <script type="text/javascript">
             $(function() {
                 $('.tipsify').tipsy({gravity: $.fn.tipsy.autoWE});
             });
         </script>
-        <!--<script type="text/javascript" src="http://lib.jnsq.us/GGS-scriptlet"></script>-->
         {% block head %}{% endblock %}
     </head>
     <body>
@@ -52,29 +53,10 @@
             {% endfor %}
             {% block content %}{% endblock %}
         </div>
-        {% if user.is_authenticated and nongprop %}
-        <div style="clear: both">
-            <a href="/property/remove/{{ nongprop.id }}/">Back to the angular view</a>
-        </div>
-        {% endif %}
-
 
         <div id="footer" class="wrapper ui-helper-clearfix">
-            Powered by charref.jnsq.us - a <img class="jnsq" src="http://lib.jnsq.us/jnsq-logo.png" /> project
-            <a href="https://github.com/makyo/charref"><img style="position: absolute; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+            Powered by charref - an <a href="http://openfurry.org" target="_blank"><img class="jnsq" src="http://openfurry.org/of-icon.png" /> OpenFurry</a> project
+            <a href="https://github.com/OpenFurry/charref"><img style="position: absolute; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
         </div>
-        <!-- Piwik -->
-        <script type="text/javascript">
-            var pkBaseURL = (("https:" == document.location.protocol) ? "https://piwik.jnsq.us/" : "http://piwik.jnsq.us/");
-            document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
-            </script><script type="text/javascript">
-            try {
-                var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 5);
-                piwikTracker.trackPageView();
-                piwikTracker.enableLinkTracking();
-            } catch( err ) {}
-</script><noscript><p><img src="http://piwik.jnsq.us/piwik.php?idsite=5" style="border:0" alt="" /></p></noscript>
-<!-- End Piwik Tracking Tag -->
-
     </body>
 </html>
