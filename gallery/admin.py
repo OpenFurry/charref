@@ -1,4 +1,4 @@
 from django.contrib import admin
-from charref.gallery.models import *
+from gallery.models import Image
 
 admin.site.register(Image)

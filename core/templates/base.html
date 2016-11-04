@@ -1,0 +1,62 @@
+{% load static %}
+
+<html>
+    <head>
+        <title>{% block title %}{% endblock %}Characters @ OpenFurry</title>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <!--[if lt IE 9]>
+        <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        <![endif]-->
+        <link href='https://fonts.googleapis.com/css?family=Gentium+Book+Basic|Cabin' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" type="text/css" href="{% static '/GGS.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static '/base.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static '/ui/css/custom-theme/jquery-ui-1.8.16.custom.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static '/tipsy/stylesheets/tipsy.css' %}" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <script type="text/javascript" src="{% static '/jquery-1.7.2.js' %}"></script>
+        <script type="text/javascript" src="{% static '/spin.js' %}"></script>
+        <script type="text/javascript" src="{% static '/tipsy.js' %}"></script>
+        <script type="text/javascript" src="{% static '/ui/js/jquery-ui-1.8.16.custom.min.js' %}"></script>
+        <script type="text/javascript">
+            $(function() {
+                $('.tipsify').tipsy({gravity: $.fn.tipsy.autoWE});
+            });
+        </script>
+        {% block head %}{% endblock %}
+    </head>
+    <body>
+        <div id="usercontrol">
+            <ul>
+                {% if user.is_authenticated %}
+                <li><a href="/~{{ user.username }}">~{{ user.username }}</a></li>
+                <li><a href="/logout">Log out</a></li>
+                {% else %}
+                <li><a href="/login">Log in</a></li>
+                <li><a href="/register">Register</a></li>
+                {% endif %}
+                <li><a href="/users">Users</a></li>
+                <li><a href="/locations">Locations</a></li>
+            </ul>
+        </div>
+        <div class="ui-helper-clearfix" id="header">
+            <div class="wrapper">
+                <h1><a href="/">Characters</a></h1>
+                <h2>{% block header %}{% endblock %}</h2>
+            </div>
+        </div>
+
+        <div id="content" class="ui-helper-clearfix">
+            {% for message in messages %}
+            {{ message|safe }}
+            {% endfor %}
+            {% block content %}{% endblock %}
+        </div>
+
+        <div id="footer" class="wrapper ui-helper-clearfix">
+            Powered by charref - an <a href="http://openfurry.org" target="_blank"><img class="jnsq" src="http://openfurry.org/of-icon.png" /> OpenFurry</a> project
+            <a href="https://github.com/OpenFurry/charref"><img style="position: absolute; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+        </div>
+    </body>
+</html>

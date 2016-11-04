@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rev="canonical" type="text/html" href="http://c.o-f.co/d/{{ description.id }}" />
+<script type="text/javascript">
+    $(function () {
+        window.__route = 'description/{{ description.id }}';
+        $('#imageBay').dialog({
+            autoOpen: false,
+            width: 300,
+            height: 400,
+            modal: true
+        });
+        $('#descriptiontext').click(function(event) { $(this).toggleClass('showdescription'); });
+    });
+</script>
+{% endblock %}
+
+{% block title %}{{ description.name }} (description) - {% endblock %}
+
+{% block header %}<a href="/~{{ description.user.username }}">~{{ description.user.username }}</a> / <a href="{{ description.morph.character.get_absolute_url }}">{{ description.morph.character.name }}</a> / <a href="{{ description.morph.get_absolute_url }}">{{ description.morph.gender }} {{ description.morph.species_text }}</a> / {{ description.name }}{% endblock %}
+
+{% block content %}
+<div id="twoway">
+    <div class="wrapper">
+        <h3>Stats</h3>
+        <p><strong>Description name:</strong> {{ description.name }}</p>
+        <p><strong>Description rating:</strong> {{ description.get_rating_display }}</p>
+        <p><strong>Description owner:</strong> <a href="/~{{ description.user.username }}">{{ description.user.username }}</a></p>
+        {% if description.user == user %}
+        <p class="addLink"><a href="{{ description.get_absolute_url }}/edit">Edit this description</a></p>
+        <p class="addLink"><a href="javascript:void(0)" onclick="$('#imageBay').dialog('open');">Attach image</a></p>
+        {% endif %}
+        <!--<div class="astream">
+            <h3>Activity stream</h3>
+            <ul>
+                {% for si in description.stream_items.all %}
+                <li class="{% cycle "odd" "even" %}" title="{{ si.action_time|date:"DATETIME_FORMAT" }}"><a href="/~{{ si.user.username }}">~{{ si.user.username }}</a> {{ si.get_action_type_display }} {{ description.name }} (description)</li>
+                {% endfor %}
+            </ul>
+        </div>-->
+        <div class="small">Permalink: <a href="http://c.o-f.co/d/{{ description.id }}">http://c.o-f.co/d/{{ description.id }}</a></div>
+    </div>
+    <div class="wrapper">
+        <h3>Description</h3>
+        {% if description.rating == "R" or description.rating == "M" %}
+        <p class="small">Click to show in full</p>
+        {% endif %}
+        <div id="descriptiontext" class="description{{description.rating}}">
+            {{ description.description|linebreaks }}
+        </div>
+    </div>
+    <div style="clear: left">
+        <h3>Images</h3>
+        {% for image in description.images.all %}
+        {% cycle "<div class=\"wrapper\">" "" %}
+        <div class="wrapper" style="height: 200px;{% if forloop.counter0|divisibleby:"4" %} clear: left;{% endif %}">
+            <a href="{{ image.image.get_absolute_url }}"><img class="thumb{{ image.image.rating }}" src="/media/{{ image.image.thumbnail }}" alt="{{ image.image.attribution }}" /></a><br />
+            {{ image.caption }}
+            {% if description.user == user %}
+            <a href="/image/{{ image.id }}/detach/">[X]</a>
+            {% endif %}
+        </div>
+        {% cycle "" "</div>" %}
+        {% if forloop.last and not forloop.counter|divisibleby:"2" %}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

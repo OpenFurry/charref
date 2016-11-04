@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rev="canonical" type="text/html" href="http://c.o-f.co/m/{{ morph.id }}" />
+<script type="text/javascript">
+    window.__route = 'morph/{{ morph.id }}';
+    $(function () {
+        $('#imageBay').dialog({
+            autoOpen: false,
+            width: 300,
+            height: 400,
+            modal: true
+        });
+        $('#createDescription').dialog({
+            autoOpen: false,
+            width: 600,
+            height: 400,
+            modal: true
+        });
+    });
+</script>
+{% endblock %}
+
+{% block title %}{{ morph.gender }} {{ morph.species_text }} (morph) - {% endblock %}
+
+{% block header %}<a href="/~{{ morph.user.username }}">~{{ morph.user.username }}</a> / <a href="{{ morph.character.get_absolute_url }}">{{ morph.character.name }}</a> / {{ morph.gender }} {{ morph.species_text }}{% endblock %}
+
+{% block content %}
+<div id="twoway">
+    <div class="wrapper">
+        <h3>Stats</h3>
+        <p><strong>Morph gender:</strong> {{ morph.gender }}</p>
+        <p><strong>Morph species text:</strong> {{ morph.species_text }}</p>
+        <p><strong>Morph species category:</strong> {{ morph.species_category }}</p>
+        <p><strong>Morph owner:</strong> <a href="/~{{ morph.user.username }}">{{ morph.user.username }}</a></p>
+        {% if morph.user == user %}
+        <p class="addLink"><a href="{{ morph.get_absolute_url }}/edit">Edit this morph</a></p>
+        <p class="addLink"><a href="javascript:void(0)" onclick="$('#imageBay').dialog('open');">Attach image</a></p>
+        {% endif %}
+        <!--<div class="astream">
+            <h3>Activity stream</h3>
+            <ul>
+                {% for si in morph.stream_items.all %}
+                <li class="{% cycle "odd" "even" %}" title="{{ si.action_time|date:"DATETIME_FORMAT" }}"><a href="/~{{ si.user.username }}">~{{ si.user.username }}</a> {{ si.get_action_type_display }} {{ morph.gender }} {{ morph.species_text }} (morph)</li>
+                {% endfor %}
+            </ul>
+        </div>-->
+        <div class="small">Permalink: <a href="http://c.o-f.co/m/{{ morph.id }}">http://c.o-f.co/m/{{ morph.id }}</a></div>
+    </div>
+    <div class="wrapper">
+        <h3>Descriptions</h3>
+        {% for description in morph.description_set.all %}
+        <p><a href="{{ description.get_absolute_url }}">{{ description.name }}</a> ({{ description.get_rating_display }})
+        {% if morph.user == user %}
+        - <a href="{{ description.get_absolute_url }}/delete">[X]</a></p>
+        {% endif %}
+        {% endfor %}
+        {% if user == morph.user %}
+            <hr />
+            <p class="addLink"><a href="javascript:void(0)" onclick="$('#createDescription').dialog('open')">+ Add description</a></p>
+            <div id="createDescription" title="Create description">
+                <form method="post" action="/description/create/">
+                    {% csrf_token %}
+                    <input type="hidden" name="morph" value="{{ morph.id }}" />
+                    <table>
+                        <tr>
+                            <th><label for="name">Name:</label></th>
+                            <td><input type="text" name="name" /></td>
+                        </tr>
+                        <tr>
+                            <th><label for="description">Description:</label></th>
+                            <td><textarea rows="10" cols="50" name="description"></textarea></td>
+                        </tr>
+                        <tr>
+                            <th><label for="rating">Rating:</label></th>
+                            <td>
+                                <select name="rating">
+                                    <option value="G">General</option>
+                                    <option value="M">Mature</option>
+                                    <option value="R">Adult</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="submit" value="Create description" /></td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+    <div style="clear: left">
+        <h3>Images</h3>
+        {% for image in morph.images.all %}
+        {% cycle "<div class=\"wrapper\">" "" %}
+        <div class="wrapper" style="height: 200px;{% if forloop.counter0|divisibleby:"4" %} clear: left;{% endif %}">
+            <a href="{{ image.image.get_absolute_url }}"><img class="thumb{{ image.image.rating }}" src="/media/{{ image.image.thumbnail }}" alt="{{ image.image.attribution }}" /></a><br />
+            {{ image.caption }}
+            {% if morph.user == user %}
+            <a href="/image/{{ image.id }}/detach/">[X]</a>
+            {% endif %}
+        </div>
+        {% cycle "" "</div>" %}
+        {% if forloop.last and not forloop.counter|divisibleby:"2" %}
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
