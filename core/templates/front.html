@@ -1,9 +1,9 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block head %}
-<script type="text/javascript">
-    window.__route = '';
-</script>
+<script src="{% static 'd3.js' %}"></script>
+<script src="{% static 'd3-layout.js' %}"></script>
 {% endblock %}
 
 {% block header %}Welcome!{% endblock %}
@@ -33,12 +33,12 @@
         </div>
         <div class="wrapper" style="clear: left">
             <div id="species"></div>
-            <script type="text/javascript" src="/species.js"></script>
+            <script type="text/javascript" src="{% static 'species.js' %}"></script>
             <p class="small">Species (morphs)</p>
         </div>
         <div class="wrapper">
             <div id="genders"></div>
-            <script type="text/javascript" src="/genders.js"></script>
+            <script type="text/javascript" src="{% static 'genders.js' %}"></script>
             <p class="small">Gender (morphs)</p>
         </div>
     </div>

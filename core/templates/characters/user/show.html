@@ -2,9 +2,6 @@
 
 {% block head %}
 <link rev="canonical" type="text/html" href="http://c.o-f.co/~{{ user_object.username }}" />
-<script type="text/javascript">
-    window.__route = '~{{user_object.username}}';
-</script>
 {% endblock %}
 
 {% block title %}{{ user_object.username }} (user) - {% endblock %}

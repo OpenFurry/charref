@@ -825,14 +825,16 @@ def ajax_list_species(request):
                             morph.species_category.__unicode__()]['count'] +
                         1,
                         'parent': morph.species_category.parent.name}})
-    for k, v in species.iteritems():
+    for k, v in species.items():
         categories[v['parent']]['children'].append(
             {'name': k, 'count': v['count']})
     for v in categories.values():
         to_return['children'].append(v)
-    with open(settings.MEDIA_ROOT + "species.json", "w") as f:
+    with open(settings.MEDIA_ROOT + "/species.json", "w") as f:
         f.write(json.dumps(to_return))
-    return HttpResponse(json.dumps(to_return), mimetype="application/json")
+    return HttpResponse(
+        json.dumps(to_return),
+        content_type="application/json")
 
 
 def ajax_list_genders(request):
@@ -844,9 +846,11 @@ def ajax_list_genders(request):
             to_return.update({morph.gender: 1})
         else:
             to_return.update({morph.gender: to_return[morph.gender] + 1})
-    with open(settings.MEDIA_ROOT + "genders.json", "w") as f:
+    with open(settings.MEDIA_ROOT + "/genders.json", "w") as f:
         f.write(json.dumps(to_return))
-    return HttpResponse(json.dumps(to_return), mimetype="application/json")
+    return HttpResponse(
+        json.dumps(to_return),
+        content_type="application/json")
 
 ##
 
