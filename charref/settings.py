@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'activitystream',
     'characters',
+    'core',
     'gallery',
     'usermgmt',
     'django.contrib.admin',

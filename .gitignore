@@ -5,3 +5,4 @@ sitesettings.py
 fix
 venv
 db.sqlite3
+.tox
