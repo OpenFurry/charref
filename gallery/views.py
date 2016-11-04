@@ -6,10 +6,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
-from charref.gallery.models import *
-from charref.gallery.forms import *
-from charref.activitystream.models import *
-from charref.usermgmt.models import *
+from gallery.models import *
+from gallery.forms import *
+from activitystream.models import *
+from usermgmt.models import *
 
 def show_image(request, image_id):
     image = get_object_or_404(Image, id = image_id)
@@ -95,7 +95,7 @@ def create_image(request):
             messages.add_message(request, messages.SUCCESS, '<div class="success">Image created - <a href="/image/create/">Add another!</a></div>')
             return HttpResponseRedirect(image.get_absolute_url())
     return render_to_response('gallery/image/edit.html', context_instance = RequestContext(request, {'form': form}))
-    
+
 @login_required
 def delete_image(request, image_id):
     image = get_object_or_404(Image, id = image_id)

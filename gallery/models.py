@@ -4,8 +4,11 @@ from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
-from charref.activitystream.models import StreamItem
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey,
+    GenericRelation,
+)
+from activitystream.models import StreamItem
 
 class Image(models.Model):
     RATINGS  = (
@@ -25,8 +28,8 @@ class Image(models.Model):
     attribution = models.CharField(max_length = 200)
     rating = models.CharField(max_length = 1, choices = RATINGS)
     user = models.ForeignKey(User)
-    stream_items = generic.GenericRelation(StreamItem)
-    attachments = generic.GenericRelation('ImageAttachment', related_name = "generic_image")
+    stream_items = GenericRelation(StreamItem)
+    attachments = GenericRelation('ImageAttachment', related_name = "generic_image")
 
     def get_absolute_url(self):
         return "/image/%d" % self.id
@@ -68,4 +71,4 @@ class ImageAttachment(models.Model):
     caption = models.CharField(max_length = 200, blank = True)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')

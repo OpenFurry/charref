@@ -8,11 +8,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_protect
-from charref.characters.models import *
-from charref.gallery.models import Image
-from charref.characters.forms import *
-from charref.activitystream.models import *
-from charref.usermgmt.models import *
+from characters.models import *
+from gallery.models import Image
+from characters.forms import *
+from activitystream.models import *
+from usermgmt.models import *
 
 def front(request):
     import random
@@ -29,13 +29,13 @@ def front(request):
     if (request.GET.get('ajax', None) is not None or request.is_ajax()):
         import json
         return HttpResponse(json.dumps({
-            'counts': counts, 
-            'new_user': new_user.username, 
-            'random_morph': { 
-                'user': random_morph.user.username, 
-                'character': { 'id': random_morph.character.id, 'name': random_morph.character.name }, 
+            'counts': counts,
+            'new_user': new_user.username,
+            'random_morph': {
+                'user': random_morph.user.username,
+                'character': { 'id': random_morph.character.id, 'name': random_morph.character.name },
                 'morph': { 'id': random_morph.id, 'display': "%s %s" % (random_morph.gender, random_morph.species_text) }
-            } 
+            }
         }), mimetype = "application/json")
     else:
         return render_to_response('front.html', context_instance = RequestContext(request, {'counts': counts, 'new_user': new_user, 'random_morph': random_morph}))
@@ -109,7 +109,7 @@ def edit_user(request, username):
     return render_to_response("characters/user/edit.html", context_instance = RequestContext(request, {'form': form, 'user_object': request.user}))
 
 def register(request):
-    if request.method == 'POST': 
+    if request.method == 'POST':
         if request.POST.get('username', None) and request.POST.get('password', None) and request.POST.get('email', None):
             user = User.objects.create_user(request.POST['username'], request.POST['email'], None)
             user.set_password(request.POST['password'])
@@ -153,7 +153,7 @@ def list_characters_for_user(request, username):
         return HttpResponse(serializers.serialize("json", characters), mimetype = "application/json")
     else:
         # Shouldn't ever really happen, this is mostly here for AJAX requests
-        return render_to_response('characters/character/list.html', context_instance = RequestContext(request, {'characters': characters})) 
+        return render_to_response('characters/character/list.html', context_instance = RequestContext(request, {'characters': characters}))
 
 def show_character(request, character_id):
     character = get_object_or_404(Character, id = character_id)
@@ -243,15 +243,15 @@ def show_morph(request, morph_id):
     if (request.is_ajax() or request.GET.get('ajax', None) == 'true'):
         import json
         return HttpResponse(json.dumps({
-            'fields': { 
-                'id': morph.id, 
+            'fields': {
+                'id': morph.id,
                 'name': morph.get_name(),
-                'species_category': morph.species_category.__unicode__(), 
-                'species_text': morph.species_text, 
-                'gender': morph.gender, 
-                'user': morph.user.username, 
-                'character': { 
-                    'id': morph.character.id, 
+                'species_category': morph.species_category.__unicode__(),
+                'species_text': morph.species_text,
+                'gender': morph.gender,
+                'user': morph.user.username,
+                'character': {
+                    'id': morph.character.id,
                     'name': morph.character.name
                 }
             },
@@ -362,10 +362,10 @@ def show_description(request, description_id):
         import json
         return HttpResponse(json.dumps({
             'fields': {
-                'id': description.id, 
+                'id': description.id,
                 'name': description.name,
-                'rating': description.rating, 
-                'rating_display': description.get_rating_display(), 
+                'rating': description.rating,
+                'rating_display': description.get_rating_display(),
                 'description': description.description,
                 'user': description.user.username
             },

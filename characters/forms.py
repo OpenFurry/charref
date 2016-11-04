@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
-from charref.characters.models import *
+from characters.models import *
 
 class UserForm(forms.ModelForm):
     class Meta:

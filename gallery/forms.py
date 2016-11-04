@@ -1,5 +1,5 @@
 from django import forms
-from charref.gallery.models import *
+from gallery.models import *
 
 class ImageForm(forms.ModelForm):
     class Meta:

@@ -3,3 +3,5 @@ public/media/*.json
 public/media/gallery
 sitesettings.py
 fix
+venv
+db.sqlite3

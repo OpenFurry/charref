@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_protect
-from charref.usermgmt.models import *
+from usermgmt.models import *
 
 @login_required
 def set_property(request):

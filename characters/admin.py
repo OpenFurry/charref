@@ -1,5 +1,5 @@
 from django.contrib import admin
-from charref.characters.models import *
+from characters.models import *
 
 admin.site.register(Character)
 admin.site.register(Morph)
