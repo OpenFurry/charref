@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
+
 class StreamItem(models.Model):
     TYPES = (
             ('C', 'created'),
@@ -17,12 +18,12 @@ class StreamItem(models.Model):
             ('DD', 'removed a description from'),
             ('LA', 'attached a character to'),
             ('LD', 'detached a character from')
-            )
+    )
 
-    action_time = models.DateTimeField(auto_now_add = True)
-    action_type = models.CharField(max_length = 2, choices = TYPES)
+    action_time = models.DateTimeField(auto_now_add=True)
+    action_type = models.CharField(max_length=2, choices=TYPES)
     user = models.ForeignKey(User)
-    notes = models.TextField(blank = True)
+    notes = models.TextField(blank=True)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')

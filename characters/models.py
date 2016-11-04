@@ -1,15 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey,
-    GenericRelation,
-)
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from gallery.models import ImageAttachment
-from activitystream.models import *
+from activitystream.models import StreamItem
+
 
 class Character(models.Model):
-    name = models.CharField(max_length = 60)
+    name = models.CharField(max_length=60)
     user = models.ForeignKey(User)
     stream_items = GenericRelation(StreamItem)
     images = GenericRelation(ImageAttachment)
@@ -23,17 +21,20 @@ class Character(models.Model):
     def get_content_type(self):
         return ContentType.objects.get_for_model(self)
 
+
 class Morph(models.Model):
     user = models.ForeignKey(User)
     character = models.ForeignKey('Character')
-    gender = models.CharField(max_length = 20)
-    species_text = models.CharField(max_length = 60)
-    species_category = models.ForeignKey('SpeciesCategory', null = True, blank = True)
+    gender = models.CharField(max_length=20)
+    species_text = models.CharField(max_length=60)
+    species_category = models.ForeignKey(
+        'SpeciesCategory', null=True, blank=True)
     stream_items = GenericRelation(StreamItem)
     images = GenericRelation(ImageAttachment)
 
     def __unicode__(self):
-        return "%s %s (~%s)" % (self.gender, self.species_text, self.user.username)
+        return "%s %s (~%s)" % (
+            self.gender, self.species_text, self.user.username)
 
     def get_name(self):
         return "%s %s" % (self.gender, self.species_text)
@@ -46,17 +47,18 @@ class Morph(models.Model):
 
 
 class Description(models.Model):
-    RATINGS  = (
-            ('G', "General"),
-            ('M', "Mature"),
-            ('R', "Adult")
-            )
+    RATINGS = (
+        ('G', "General"),
+        ('M', "Mature"),
+        ('R', "Adult")
+    )
 
-    user = models.ForeignKey(User) # Keeps us from having to say description.morph.character.user
+    # Keeps us from having to say description.morph.character.user
+    user = models.ForeignKey(User)
     morph = models.ForeignKey('Morph')
-    name = models.CharField(max_length = 30)
+    name = models.CharField(max_length=30)
     description = models.TextField()
-    rating = models.CharField(max_length = 1, choices = RATINGS)
+    rating = models.CharField(max_length=1, choices=RATINGS)
     stream_items = GenericRelation(StreamItem)
     images = GenericRelation(ImageAttachment)
 
@@ -69,8 +71,9 @@ class Description(models.Model):
     def get_content_type(self):
         return ContentType.objects.get_for_model(self)
 
+
 class Location(models.Model):
-    name = models.CharField(max_length = 120)
+    name = models.CharField(max_length=120)
     description = models.TextField()
     user = models.ForeignKey(User)
     stream_items = GenericRelation(StreamItem)
@@ -85,14 +88,16 @@ class Location(models.Model):
     def get_content_type(self):
         return ContentType.objects.get_for_model(self)
 
+
 class CharacterLocation(models.Model):
     character = models.ForeignKey(Character)
     location = models.ForeignKey(Location)
-    name_at_location = models.CharField(max_length = 50, blank = True)
+    name_at_location = models.CharField(max_length=50, blank=True)
+
 
 class SpeciesCategory(models.Model):
-    name = models.CharField(max_length = 50)
-    parent = models.ForeignKey('SpeciesCategory', blank = True, null = True)
+    name = models.CharField(max_length=50)
+    parent = models.ForeignKey('SpeciesCategory', blank=True, null=True)
 
     def __unicode__(self):
         if self.parent is None:
